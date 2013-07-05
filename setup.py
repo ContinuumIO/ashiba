@@ -1,8 +1,13 @@
 #!/usr/bin/env python
 """Ashiba"""
 
-from distutils.core import setup
 import sys
+
+if "develop" in sys.argv[1:]:
+    import setuptools
+
+from distutils.core import setup
+
 from os.path import join, dirname
 from distutils.sysconfig import get_python_lib
 from distutils.dir_util import copy_tree
