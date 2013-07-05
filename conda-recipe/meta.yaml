@@ -1,0 +1,29 @@
+# This is a sample conda recipe, which is used for testing features
+# in the conda build command.
+
+package:
+  name: ashiba
+  version: 0.0
+
+source:
+  git_url: git@github.com:ContinuumIO/ashiba.git
+  # Should be git_tag: 0.1
+  git_branch: master
+
+requirements:
+  build:
+    - python
+  run:
+    - flask
+    - matplotlib
+    - python
+    - numpy
+
+test:
+  imports:
+    - ashiba
+  commands:
+    - ashiba --help
+
+about:
+  home: https://github.com/ContinuumIO/ashiba

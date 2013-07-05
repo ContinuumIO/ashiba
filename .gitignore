@@ -13,4 +13,7 @@ dist
 build
 *.egg-info
 
+stock_tracker/app
+temperature_conversion/app/
+
 .DS_Store
