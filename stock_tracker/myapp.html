@@ -6,28 +6,23 @@
 
 <div class="row">
   <div class="span3" id="div_control">
-    <!--form>
-      <fieldset-->
-        <label>Select a stock</label>
-        <select id="select_stock">
-          <option value="">Select a stock</option>
-          <option value="AAPL">Apple (AAPL)</option>
-          <option value="GOOG">Google (GOOG)</option>
-        </select>
-        <label>Rolling mean windows, in days</label>
-        <input id="slider_window_1" type="range" value="4"  min="1" max="52">
-        <input id="slider_window_2" type="range" value="20" min="1" max="52">
-        <label>Start date</label>
-        <input type="date" id="date_start">
-        <label>End date</label>
-        <input type="date" id="date_end">
-      <!--/fieldset>
-    </form-->
+    <label>Select a stock</label>
+    <select id="select_stock">
+      <option value="">Select a stock</option>
+      <option value="AAPL">Apple (AAPL)</option>
+      <option value="GOOG">Google (GOOG)</option>
+    </select>
+    <label>Rolling mean windows, in weeks</label>
+    <input id="slider_window_1" type="range" value="4"  min="1" max="52">
+    <input id="slider_window_2" type="range" value="20" min="1" max="52">
+    <label>Start date</label>
+    <input type="date" id="date_start">
+    <label>End date</label>
+    <input type="date" id="date_end">
     <a href="#" class="btn" id="btn_update">Update</a>
   </div><!-- #div-control -->
   <div class="span9" id="div_plot">
-    <img id="img_plot" class="text-center">
-      <p class="text-center">This is where the plot will go</p>
-    </img>
+    <img id="img_plot" class="text-center ashiba-visible" 
+        ashiba="src   id   class"></img>
   <div><!-- #div-plot -->
 </div><!--.row-->
