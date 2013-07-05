@@ -1,3 +1,17 @@
+import collections
+
+def autoviv():
+    return collections.defaultdict(autoviv)
+
+def autovivify(d):
+    if isinstance(d, dict):
+        new_d = autoviv()
+        new_d.update(d)
+        d = new_d
+        for k in d:
+            d[k] = autovivify(d[k])
+    return d
+
 def dict_diff(a, b):
     diffs = {}
     for k in a:
