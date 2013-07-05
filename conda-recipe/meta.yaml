@@ -16,8 +16,8 @@ requirements:
   run:
     - flask
     - matplotlib
-    # - python
-    # - numpy
+    - python
+    - numpy
 
 test:
   imports:
