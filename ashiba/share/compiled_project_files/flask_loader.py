@@ -1,33 +1,18 @@
 import sys, os
-# This is due to symlinks :\
-if os.getcwd() not in sys.path:
-    sys.path.insert(0,os.getcwd())
 import copy
 import json
-import collections
+import pprint
 
 import flask
 from flask import Flask, Response, redirect, render_template, request, url_for
+
+import ashiba.utils
 import myapp
 import settings
-#should be ashiba.utils or something
-import utils
 
 app = Flask(__name__)
-SETTINGS= {k:v for k,v in settings.__dict__.items() 
+SETTINGS = {k:v for k,v in settings.__dict__.items() 
                     if not k.startswith('__')}
-
-def autoviv():
-    return collections.defaultdict(autoviv)
-
-def autovivify(d):
-    if isinstance(d, dict):
-        new_d = autoviv()
-        new_d.update(d)
-        d = new_d
-        for k in d:
-            d[k] = autovivify(d[k])
-    return d
 
 @app.route('/event/<obj_id>/<event>', methods=['POST'])
 def fire_event(obj_id, event):
@@ -42,14 +27,14 @@ def fire_event(obj_id, event):
         return 'No data included.', 200
     
     try:
-        dom = autovivify(json.loads(request.data))
+        dom = ashiba.utils.autovivify(json.loads(request.data))
         new_dom = fcn(copy.deepcopy(dom))
     except ValueError, e:
         return e.message, 400
     
-    dom_changes = utils.dict_diff(new_dom, dom)
+    dom_changes = ashiba.utils.dict_diff(new_dom, dom)
     print "DOM CHANGES:"
-    print dom_changes
+    pprint.pprint(dom_changes)
     return flask.jsonify({'success'    :True,
                           'dom_changes':dom_changes})
 
