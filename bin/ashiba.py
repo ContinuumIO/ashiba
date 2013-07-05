@@ -1,7 +1,7 @@
 import re, os, sys, shutil
 
 __version__ = 0.0
-ASHIBA_SHARE = os.path.join(os.getcwd(), 'ashiba_share')
+ASHIBA_SHARE = os.path.join(__file__, os.pardir, 'ashiba_share')
 print 'ASHIBA_SHARE:', ASHIBA_SHARE
 
 def templatify_html(in_file):
@@ -9,8 +9,8 @@ def templatify_html(in_file):
         buf = in_file.read()
     else:
         buf = in_file
-    
-    for search_str in ['{% block content %}', 
+
+    for search_str in ['{% block content %}',
                        '{% extends "app_template.html" %}']:
         if search_str not in buf:
             buf = search_str + '\n' + buf
@@ -39,7 +39,7 @@ def _compile(args):
         shutil.rmtree('app')
 
     shutil.copytree(
-        os.path.join(ASHIBA_SHARE, 'compiled_project_files'), 
+        os.path.join(ASHIBA_SHARE, 'compiled_project_files'),
         'app')
     for fname in os.listdir('.'):
         root, ext = os.path.splitext(fname)
