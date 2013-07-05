@@ -7,12 +7,14 @@
 ## You can delete this comment once you've read it.
 import os, os.path
 import time
+import io
 
 import pandas as pd
 import matplotlib as mpl
-mpl.use('Agg')
+mpl.use('svg')
 import matplotlib.pyplot as plt
-# Globals are kinda okay...
+
+# Globals are okay, they load at server start.
 
 AAPL = pd.DataFrame.from_csv("aapl.csv")
 GOOG = pd.DataFrame.from_csv("goog.csv")
@@ -29,26 +31,19 @@ def btn_update__click(dom):
     bounds = [dom[x]['value'] if dom[x]['value'] else None 
               for x in ['date_start', 'date_end']] 
     ts = df['Close'][bounds[0]:bounds[1]]
-    if not ts.any():
-        # Error message?
-        return dom
-    try:
-        ts.plot()
-        for win in [int(dom[x]['value']) 
-                    for x in ['slider_window_1', 'slider_window_2']]:
-            pd.rolling_mean(ts, win).plot()
-        plt.title("Weekly closing prices for {}".format(symbol))
-        
-        fname_parts = ('static','img','tmp',
-            '{}-{}.png'.format(symbol, int(time.time())))
-        fname = os.path.join(*fname_parts)
-        if not os.path.exists(os.path.join(*fname_parts[:-1])):
-            os.makedirs(os.path.join(*fname_parts[:-1]))
-        plt.savefig(fname)
-        
-        dom['img_plot']['src'] = '/'.join(fname_parts)
-    finally:
-        plt.close()
+    if ts.any():
+        try:
+            ts.plot()
+            for win in [int(dom[x]['value']) 
+                        for x in ['slider_window_1', 'slider_window_2']]:
+                pd.rolling_mean(ts, win).plot()
+            plt.title("Weekly closing prices for {}".format(symbol))
+            
+            svg = io.StringIO()
+            plt.savefig(svg)
+            dom['div_plot']['innerHTML'] = svg.getvalue()
+        finally:
+            plt.close()
 
     return dom
 
