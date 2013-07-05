@@ -21,7 +21,8 @@ def templatify_html(in_file):
 
     return buf
 
-def _compile(path, *args):
+def _compile(args):
+    path = args.path
     os.chdir(path)
     if os.getcwd() not in sys.path:
         sys.path.insert(0, os.getcwd())
@@ -90,21 +91,22 @@ def _compile(path, *args):
     outfile.write("\n});") #end document.ready
     outfile.close()
 
-    ## Put the boilerplate header on top of the html
-
-def _init(path, *args):
+def _init(args):
+    path = args.path
     print "Init:", path
     if os.path.exists(path):
         sys.exit("Fatal: Path '{}' already exists.".format(
             os.path.abspath(path)))
     shutil.copytree(os.path.join(ASHIBA_SHARE, 'new_project_files'), path)
 
-def _clean(path, *args):
+def _clean(args):
+    path = args.path
     to_clean = os.path.join(path, 'app')
     print "CLEAN: {}".format(to_clean)
     shutil.rmtree(to_clean)
 
-def _start(path, *args):
+def _start(args):
+    path = args.path
     app_path = os.path.join(path, 'app')
     if os.path.isdir(app_path):
         os.chdir(app_path)
@@ -116,13 +118,18 @@ def _start(path, *args):
     print "Running webserver in dir:", os.getcwd()
     flask_loader.app.run(host='localhost', port=12345, debug=True, threaded=True)
 
-def _help(*args):
+def _help(args):
     print "Usage: ashiba [init|compile|start|clean] <app_dir>"
 
 if __name__ == "__main__":
-    command = sys.argv[1].strip() if len(sys.argv) > 1 else 'help'
-    cmd_args = sys.argv[2:] if len(sys.argv) > 2 else []
+    import argparse
+    parser = argparse.ArgumentParser()
+    parser.add_argument('command', help='Ashiba command: [init|compile|start|clean]')
+    parser.add_argument('path', help='Path to Ashiba project.')
+    args_in = parser.parse_args()
+
+    command = args_in.command
     {'compile': _compile,
      'init'   : _init,
      'start'  : _start,
-     'clean'  : _clean}.get(command, _help)(*cmd_args)
+     'clean'  : _clean}.get(command, _help)(args_in)
