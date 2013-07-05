@@ -1,7 +1,6 @@
 import re, os, sys, shutil
 
-__version__ = 0.0
-ASHIBA_SHARE = os.path.join(__file__, os.pardir, 'ashiba_share')
+ASHIBA_SHARE = os.path.join(os.path.dirname(__file__), 'share')
 print 'ASHIBA_SHARE:', ASHIBA_SHARE
 
 def templatify_html(in_file):
@@ -121,7 +120,7 @@ def _start(args):
 def _help(args):
     print "Usage: ashiba [init|compile|start|clean] <app_dir>"
 
-if __name__ == "__main__":
+def main():
     import argparse
     parser = argparse.ArgumentParser()
     parser.add_argument('command', help='Ashiba command: [init|compile|start|clean]')
