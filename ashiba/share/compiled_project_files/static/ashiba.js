@@ -25,6 +25,25 @@ var ashiba = {
         dom[element.id]['value'] = element.value;
       }
     }
+   
+    /* This is for manually specifying other DOM object-properties to be
+     * visible. */
+    /*
+    var extras = $('.ashiba_visible, .ashiba-visible');
+    for(i=0;i<extras.length;i++){
+      if(!!extras[i].id){
+        var element = extras[i];
+        dom[element.id] = {};
+        var properties = element.ashiba.split(' ');
+        for(j=0;j<properties.length;j++){
+          var property = properties[j];
+          if(property){
+            dom[element.id][property] = element[property];
+          }
+        }
+      }
+    }
+    */
 
     return JSON.stringify(dom);
   },
@@ -55,9 +74,15 @@ var ashiba = {
             + JSON.stringify(data));
         ashiba.setDom(data);
       }).fail(function(data){
-        debugStr = data.responseText
-        console.log("AJAX failure: " + debugStr)
-        alert(debugStr) 
+        debugStr = data.responseText;
+        if (debugStr.indexOf('Werkzeug Debugger') >= 0){
+          document.body.innerHTML = debugStr;
+          console.log("AJAX failure: " +
+                      /.*\/\//.exec($('title').last().text()));
+        } else {
+          alert("AJAX failure: " + debugStr);
+          console.log("AJAX failure: " + debugStr);
+        }
       });
     };
   }
