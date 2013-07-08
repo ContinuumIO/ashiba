@@ -1,9 +1,3 @@
-
-.bg-clouds{
-  background-image: url('img/wooden_clouds.jpg');
-  background-repeat: repeat;
-  background-attachment:fixed;
-}
 .roundedcorners-top{
   -moz-border-radius-topleft: 8px;
   border-top-left-radius: 8px;
