@@ -1,4 +1,7 @@
-#vim swaps
+# Ashiba change trackers
+.modified.json
+
+# vim swaps
 *.swp
 *.*~
 
