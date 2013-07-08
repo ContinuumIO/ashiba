@@ -74,7 +74,7 @@ def _compile(args):
     shutil.copytree(
         os.path.join(ASHIBA_SHARE, 'compiled_project_files'),
         'app')
-    for fname in os.listdir('.'):
+    for fname in [x for x in os.listdir('.') if not x.startswith('.')]:
         root, ext = os.path.splitext(fname)
         if ext == '.py':
             shutil.copy(fname, os.path.join('app', fname))
