@@ -2,30 +2,20 @@
 var ashiba = {
   'getDom' : function(){
     var dom = {}; 
-    var inputs = $('input');
+    var inputs = $('input, select');
     for(i=0;i<inputs.length;i++){
-      if(!!inputs[i].id){
-        var element = inputs[i];
-        if(element.type === "text" ||
-           element.type === "range"||
-           element.type === "date"){
-          dom[element.id] = {};
-          dom[element.id]['value'] = element.value;
-        } else if(element.type === "checkbox"){
-          dom[element.id] = {};
+      var element = inputs[i];
+      if(!!element.id){
+        dom[element.id] = {};
+        if (element.type === "checkbox"||
+            element.type === "radio"){
           dom[element.id]['checked'] = element.checked;
+        }else{
+          dom[element.id]['value'] = element.value;
         }
       }
     }
-    var selects = $('select');
-    for(i=0;i<selects.length;i++){
-      if(!!selects[i].id){
-        var element = selects[i];
-        dom[element.id] = {};
-        dom[element.id]['value'] = element.value;
-      }
-    }
-   
+
     /* This is for manually specifying other DOM object-properties to be
      * visible. */
     /*
