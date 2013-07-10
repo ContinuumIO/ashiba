@@ -52,6 +52,15 @@ var ashiba = {
     });
   },
 
+  'grabAttr' : function (o){
+    var att = o.attributes;
+    var out = {};
+    for (i=0;i<att.length;i++){
+      out[att[i].name] = att[i].value;
+    }
+    return out;
+  },
+
   'eventHandlerFactory' : function (objName, eventName){
     return function(){
       $.ajax({
