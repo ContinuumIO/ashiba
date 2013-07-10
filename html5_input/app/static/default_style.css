@@ -1,0 +1,32 @@
+.roundedcorners-top{
+  -moz-border-radius-topleft: 8px;
+  border-top-left-radius: 8px;
+  -moz-border-radius-topright: 8px;
+  border-top-right-radius: 8px;
+  padding-left:10px;
+  padding-right:10px;
+  padding-top:10px;
+}
+.roundedcorners{
+  -moz-border-radius: 8px;
+  border-radius: 8px;
+  padding-left:10px;
+  padding-right:10px;
+  padding-top:10px;
+  padding-bottom:10px;
+}
+.pretty-border{
+  border: solid 1px  rgba(0, 0, 0, 0.25);
+  -webkit-box-shadow: 0 0 25px  rgba(0, 0, 0, 0.25);
+  -moz-box-shadow: 0 0 25px rgba(0,0,0,0.25); 
+  box-shadow: 0 0 25px  rgba(0, 0, 0, 0.25);
+}
+.container{
+  background-color: rgba(255,255,255,0.9);
+}
+.center-box{
+  display: inline-block;
+  margin: auto;
+  text-align:center;
+  padding-top: 10px;
+}
