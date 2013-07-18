@@ -1,6 +1,9 @@
 # Ashiba change trackers
 .modified.json
 
+# Ashiba compiled app folders
+*/app/
+
 # vim swaps
 *.swp
 *.*~
@@ -15,8 +18,5 @@
 dist
 build
 *.egg-info
-
-stock_tracker/app
-temperature_conversion/app/
 
 .DS_Store
