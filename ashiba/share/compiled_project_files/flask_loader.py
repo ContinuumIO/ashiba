@@ -7,6 +7,7 @@ import flask
 from flask import Flask, Response, redirect, render_template, request, url_for
 
 import ashiba.utils
+import ashiba.dom
 import myapp
 import settings
 
@@ -21,20 +22,22 @@ def fire_event(obj_id, event):
     if not fcn:
         return 'Event function not found.', 404
     print "REQUEST RECEIVED:"
-    print request.data
+    print pprint.pprint(request.data) 
+    #An extra None gets printed here. Why?
     print ""
     if not request.data:
         return 'No data included.', 200
     
     try:
-        dom = ashiba.utils.autovivify(json.loads(request.data))
-        new_dom = fcn(copy.deepcopy(dom))
+        dom = ashiba.dom.Dom(json.loads(request.data))
+        dom = fcn(dom)
     except ValueError, e:
         return e.message, 400
     
-    dom_changes = ashiba.utils.dict_diff(new_dom, dom)
+    dom_changes = dom.changes()
     print "DOM CHANGES:"
     pprint.pprint(dom_changes)
+    print ""
     return flask.jsonify({'success'    :True,
                           'dom_changes':dom_changes})
 
