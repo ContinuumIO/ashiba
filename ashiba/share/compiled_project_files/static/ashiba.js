@@ -7,6 +7,9 @@ var ashiba = {
       var element = inputs[i];
       if(!!element.id){
         dom[element.id] = {};
+        var meta = {'nodeName' :element.nodeName,
+                    'innerHTML':element.innerHTML};
+        dom[element.id]['_meta'] = meta;
         if (element.type === "checkbox"||
             element.type === "radio"){
           dom[element.id]['checked'] = element.checked;
@@ -47,7 +50,14 @@ var ashiba = {
                   + "    Property: " + property + '\n'
                   + "       Value: " + domObj[element_name][property] + '\n'
         );
-        element[property] = domObj[element_name][property];
+        if (property != '_meta'){
+          element[property] = domObj[element_name][property];
+        } else {
+          var meta = domObj[element_name]['_meta'];
+          if (meta.innerHTML !== undefined){  
+            element.innerHTML = meta.innerHTML;
+          }
+        }
       });
     });
   },
@@ -63,6 +73,7 @@ var ashiba = {
 
   'eventHandlerFactory' : function (objName, eventName){
     return function(){
+      console.log("Received event #" + objName + ":" + eventName);
       $.ajax({
         url: "event/" + objName + "/" + eventName,
         type: 'POST',
