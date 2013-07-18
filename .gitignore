@@ -2,7 +2,7 @@
 .modified.json
 
 # Ashiba compiled app folders
-*/app/
+examples/*/app/
 
 # vim swaps
 *.swp
