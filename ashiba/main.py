@@ -15,9 +15,11 @@ print 'ASHIBA_SHARE:', ASHIBA_SHARE
 
 @contextmanager
 def stay():
+    oldpath = sys.path
     oldcwd = os.getcwd()
     yield
     os.chdir(oldcwd)
+    sys.path = oldpath
 
 def stay_put(fcn):
     def decorated_fcn(*args, **kwargs):
@@ -200,7 +202,17 @@ def _qt(args):
     name = os.path.split(args.path)[-1]
     server = mp.Process(target=_start, args=(args,))
     server.start()
-    browser = mp.Process(target=browse, args=(url, name))
+    with stay():
+        os.chdir(os.path.join(args.path, 'app'))
+        sys.path.insert(0, os.getcwd())
+        import settings
+        if 'QT_ICON' in settings.__dict__:
+            icon = os.path.abspath(settings.QT_ICON)
+        elif 'APP_ICON' in settings.__dict__:
+            icon = os.path.abspath(settings.APP_ICON)
+        else:
+            icon = ''
+    browser = mp.Process(target=browse, args=(url, name, icon))
     browser.start()
     browser.join()
     # This stuff happens after Qt window is closed
@@ -208,8 +220,8 @@ def _qt(args):
     server.terminate()
     sys.exit()
 
-def browse(url, name=''):
-    from PySide.QtGui import QApplication
+def browse(url, name='', icon=''):
+    from PySide.QtGui import QApplication, QIcon
     from PySide.QtCore import QUrl
     from PySide.QtWebKit import QWebView
 
@@ -227,6 +239,11 @@ def browse(url, name=''):
     qtapp = QApplication(name)
     web = QWebView()
     web.load(QUrl(url))
+    if icon:
+        print "Setting Icon to", icon
+        web.setWindowIcon(QIcon(icon))
+    else:
+        print "WARNING: No icon found in settings.py"
     web.show()
     qtapp.exec_()
 
