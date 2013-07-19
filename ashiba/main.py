@@ -199,7 +199,6 @@ def compile_enaml(fpath):
 
 def _qt(args):
     url = 'http://localhost:12345'
-    name = os.path.split(args.path)[-1]
     server = mp.Process(target=_start, args=(args,))
     server.start()
     with stay():
@@ -212,6 +211,13 @@ def _qt(args):
             icon = os.path.abspath(settings.APP_ICON)
         else:
             icon = ''
+
+        if 'APP_NAME' in settings.__dict__:
+            name = settings.APP_NAME
+        else:
+            name = os.path.split(args.path)[-1]
+        name = "Ashiba: " + name
+
     browser = mp.Process(target=browse, args=(url, name, icon))
     browser.start()
     browser.join()
@@ -244,6 +250,7 @@ def browse(url, name='', icon=''):
         web.setWindowIcon(QIcon(icon))
     else:
         print "WARNING: No icon found in settings.py"
+    web.setWindowTitle(name)
     web.show()
     qtapp.exec_()
 
