@@ -1,0 +1,13 @@
+from enaml.web.api import Window, Form, Label, Textbox, Button
+
+
+enamldef Main(Window):
+    attr message = "Hello, world!"
+    Form:
+    	text = message
+    	Textbox:
+    		text = "32 F"
+    	Label:
+            text = "Label Name"
+    Button:
+   		text = "Convert"
