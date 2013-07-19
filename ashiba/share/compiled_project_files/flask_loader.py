@@ -8,7 +8,7 @@ from flask import Flask, Response, redirect, render_template, request, url_for
 
 import ashiba.utils
 import ashiba.dom
-import events
+import handlers
 import settings
 
 app = Flask(__name__)
@@ -18,7 +18,7 @@ SETTINGS = {k:v for k,v in settings.__dict__.items()
 @app.route('/event/<obj_id>/<event>', methods=['POST'])
 def fire_event(obj_id, event):
     fcn_name = "{}__{}".format(obj_id, event)
-    fcn = events.__dict__.get(fcn_name)
+    fcn = handlers.__dict__.get(fcn_name)
     if not fcn:
         return 'Event function not found.', 404
     print "REQUEST RECEIVED:"

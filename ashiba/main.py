@@ -66,7 +66,7 @@ def _compile(args):
     import settings
     SETTINGS = {k:v for k,v in settings.__dict__.items() \
                         if not k.startswith('__')}
-    import events
+    import handlers
 
     if os.path.isfile('app'):
         sys.exit("Fatal: \
@@ -116,7 +116,7 @@ def _compile(args):
     outfile = open(file_path, 'w')
     outfile.write("/* Compiled with Ashiba v{} */\n".format(ashiba.__version__))
     outfile.write("\n$(window).load(function(){")
-    fcn_names = [k for k in events.__dict__ if re.match('[\w]+?__[\w]+', k)]
+    fcn_names = [k for k in handlers.__dict__ if re.match('[\w]+?__[\w]+', k)]
 
     for fcn_name in fcn_names:
         print "--> Translating", fcn_name
