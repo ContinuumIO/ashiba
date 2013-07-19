@@ -1,8 +1,11 @@
 import re
 import sys
 import json
+import time
 import shutil
+import urllib2
 import os, os.path
+import multiprocessing as mp
 from contextlib import closing, contextmanager
 
 import ashiba, ashiba.utils
@@ -187,6 +190,41 @@ def compile_enaml(fpath):
     out_file.write(templatify_html(open(root + '.html')))
     out_file.close()
 
+def _qt(args):
+    url = 'http://localhost:12345'
+    name = os.path.split(args.path)[-1]
+    server = mp.Process(target=_start, args=(args,))
+    server.start()
+    browser = mp.Process(target=browse, args=(url, name))
+    browser.start()
+    browser.join()
+    # This stuff happens after Qt window is closed
+    print "Qt window closed. Quitting."
+    server.terminate()
+    sys.exit()
+
+def browse(url, name=''):
+    from PySide.QtGui import QApplication
+    from PySide.QtCore import QUrl
+    from PySide.QtWebKit import QWebView
+
+    for try_ in range(10):
+        try:
+            assert urllib2.urlopen(url).code == 200
+        except (AssertionError, urllib2.URLError):
+            time.sleep(0.25)
+        else:
+            print "Started Qt Web View after %i ticks." % try_
+            break
+    else:
+        sys.exit("Error initializing Qt Web View.")
+
+    qtapp = QApplication(name)
+    web = QWebView()
+    web.load(QUrl(url))
+    web.show()
+    qtapp.exec_()
+
 def _help(args):
     print "Usage: ashiba [init|compile|start|clean] <app_dir>"
 
@@ -202,4 +240,5 @@ def main():
      'init'   : _init,
      'start'  : _start,
      'clean'  : _clean,
+     'qt'     : _qt,
     }.get(command, _help)(args_in)
