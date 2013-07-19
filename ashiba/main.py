@@ -63,25 +63,29 @@ def _compile(args):
     import settings
     SETTINGS = {k:v for k,v in settings.__dict__.items() \
                         if not k.startswith('__')}
-    import myapp
+    import events
 
     if os.path.isfile('app'):
         sys.exit("Fatal: \
             There can't be a file named 'app' in the project dir.")
     elif os.path.isdir('app'):
         shutil.rmtree('app')
-
     shutil.copytree(
-        os.path.join(ASHIBA_SHARE, 'compiled_project_files'),
-        'app')
+        os.path.join(ASHIBA_SHARE, 'compiled_project_files'), 'app')
+
+    ENAML = False
+    if os.path.isfile('myapp.enaml'):
+        compile_enaml('myapp.enaml')
+        ENAML = True
+
     for fname in [x for x in os.listdir('.') if not x.startswith('.')]:
         root, ext = os.path.splitext(fname)
-        if ext == '.py':
+        if ext in ['.py']:
             shutil.copy(fname, os.path.join('app', fname))
         elif ext == '.html':
             if root != 'myapp':
                 shutil.copy(fname, os.path.join('app', 'templates', fname))
-            else:
+            elif not ENAML:
                 in_file = open(fname)
                 out_file = open(os.path.join('app', 'templates', fname), 'w')
                 out_file.write(templatify_html(in_file))
@@ -109,7 +113,7 @@ def _compile(args):
     outfile = open(file_path, 'w')
     outfile.write("/* Compiled with Ashiba v{} */\n".format(ashiba.__version__))
     outfile.write("\n$(window).load(function(){")
-    fcn_names = [k for k in myapp.__dict__ if re.match('[\w]+?__[\w]+', k)]
+    fcn_names = [k for k in events.__dict__ if re.match('[\w]+?__[\w]+', k)]
 
     for fcn_name in fcn_names:
         print "--> Translating", fcn_name
@@ -160,11 +164,28 @@ def _start(args):
     sys.path.insert(0, app_path)
     os.chdir(app_path)
 
+    host, port = 'localhost', '12345'
     import flask_loader
-    flask_loader.app.run(host='localhost', port=12345, 
+    flask_loader.app.run(host=host, port=port, 
                          debug       =True,
                          threaded    =True, 
-                         use_reloader=False,)
+                         use_reloader=False,)    
+
+@stay_put
+def compile_enaml(fpath):
+    print "Compiling Enaml from", fpath
+    abspath = os.path.abspath(fpath)
+    os.chdir('app')
+    path, fname = os.path.split(abspath)
+    shutil.copy(abspath, fname)
+    sys.path.insert(0, os.getcwd())
+    import enaml_loader
+    # Should spit out myapp.html to pwd
+    enaml_loader.main()
+    root, ext = os.path.splitext(fname)
+    out_file = open(os.path.join('templates', root + '.html'), 'w')
+    out_file.write(templatify_html(open(root + '.html')))
+    out_file.close()
 
 def _help(args):
     print "Usage: ashiba [init|compile|start|clean] <app_dir>"
@@ -180,4 +201,5 @@ def main():
     {'compile': _compile,
      'init'   : _init,
      'start'  : _start,
-     'clean'  : _clean}.get(command, _help)(args_in)
+     'clean'  : _clean,
+    }.get(command, _help)(args_in)
