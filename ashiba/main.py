@@ -141,9 +141,14 @@ def _init(args):
 
 def _clean(args):
     path = args.path
-    to_clean = os.path.join(path, 'app')
-    print "CLEAN: {}".format(to_clean)
-    shutil.rmtree(to_clean)
+    app_dir = os.path.join(path, 'app')
+    if os.path.isdir(app_dir):
+        print "CLEAN: {}".format(app_dir)
+        shutil.rmtree(app_dir)
+    
+    modified = os.path.join(path, '.modified.json')
+    if os.path.isfile(modified):
+        os.remove(modified)
 
 def _start(args):
     path = args.path
