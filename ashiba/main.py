@@ -4,9 +4,12 @@ import json
 import time
 import shutil
 import urllib2
+import tempfile
 import os, os.path
 import multiprocessing as mp
 from contextlib import closing, contextmanager
+
+import yaml
 
 import ashiba, ashiba.utils
 
@@ -23,18 +26,15 @@ def stay():
 
 def stay_put(fcn):
     def decorated_fcn(*args, **kwargs):
-        oldcwd = os.getcwd()
-        try:
+        with stay():
             return fcn(*args, **kwargs)
-        finally:
-            os.chdir(oldcwd)
     return decorated_fcn
 
 
 def get_mtimes(path):
     mtimes = {}
     for root, dirs, files in os.walk(path):
-        if not root.startswith(os.path.join('.', path, '/app')):
+        if os.path.join(path, 'app') not in root:
             for fname in files:
                 if not (fname.startswith('.') or fname.endswith('.pyc')):
                     fpath = os.path.join(root, fname)
@@ -143,14 +143,22 @@ def _init(args):
 
 def _clean(args):
     path = args.path
-    app_dir = os.path.join(path, 'app')
-    if os.path.isdir(app_dir):
-        print "CLEAN: {}".format(app_dir)
-        shutil.rmtree(app_dir)
+    clean_app_dir(path)
+
+def clean_app_dir(path):
+    for app_dir in [os.path.join(path, d) for d in ['app', 'build']]:
+        if os.path.isdir(app_dir):
+            print "CLEAN: {}".format(app_dir)
+            shutil.rmtree(app_dir)
     
     modified = os.path.join(path, '.modified.json')
     if os.path.isfile(modified):
         os.remove(modified)
+
+    for root, dirs, files in os.walk(path):
+        for fname in files:
+            if fname.endswith('.pyc'):
+                os.remove(os.path.join(root, fname))
 
 def _start(args):
     path = args.path
@@ -254,13 +262,77 @@ def browse(url, name='', icon=''):
     web.show()
     qtapp.exec_()
 
+@stay_put
+def _build(args):
+    path = args.path
+    os.chdir(path)
+    if os.getcwd() not in sys.path:
+        sys.path.insert(0, os.getcwd())
+
+    import settings
+    SETTINGS = {k:v for k,v in settings.__dict__.items() \
+                        if not k.startswith('__')}
+
+    required_keys = ['APP_NAME']
+    if len(set(required_keys) - set(SETTINGS.keys())):
+        error_str = "ERROR: The following settings are missing from the settings.py file:"
+        for key in set(required_keys) - set(SETTINGS.keys()):
+            error_str += "\n* " + key
+        sys.exit(error_str)
+
+    app_head = os.path.split(os.getcwd())[-1]
+
+    meta = {}
+    meta['package'] = { 'name'    : SETTINGS['APP_NAME'],
+                        'version' : 0.0,
+                        }
+    meta['requirements'] = {}
+    meta['requirements']['build'] = meta['requirements']['run'] = [
+                        'python',
+                        'pyside',
+                        'matplotlib',
+                        'ashiba',
+                        ]
+    meta['app'] = {     'entry'  : "ashiba qt ashiba/{}".format(app_head),
+                        'type'   : 'web',
+                        }
+    if 'APP_ICON' in SETTINGS:
+        meta['app']['icon'] = os.path.join('ashiba', 
+                                app_head, SETTINGS['APP_ICON'])
+    if 'APP_SUMMARY' in SETTINGS:
+        meta['app']['summary'] = SETTINGS['APP_SUMMARY']
+
+    binstar_path = SETTINGS.get('BINSTAR_ID', '')
+    meta['about'] = {   'home'   : 'http://binstar.org/' + binstar_path,
+                        'license': SETTINGS.get('LICENSE')
+                        }
+
+    build_dir = os.path.abspath('build')
+    if os.path.isdir(build_dir):
+        print "CLEAN: {}".format(build_dir)
+        shutil.rmtree(build_dir)
+
+    source_dir = os.path.join('build', 'src', app_head)
+    temp_dir = os.path.join(tempfile.mkdtemp(), app_head)
+    shutil.copytree(os.getcwd(), temp_dir)
+    clean_app_dir(temp_dir)
+    shutil.copytree(temp_dir, source_dir)
+
+    with closing(open(os.path.join(build_dir, 'meta.yaml'), 'w')) as f_out:
+        f_out.write(yaml.dump(meta))
+
+    ## TODO: Write build scripts
+
+
+
 def _help(args):
-    print "Usage: ashiba [init|compile|start|clean] <app_dir>"
+    print "Usage: ashiba [init|compile|start|qt|build|clean] <app_dir>"
 
 def main():
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('command', help='Ashiba command: [init|compile|start|clean]')
+    parser.add_argument('command', 
+                    help='Ashiba command: [init|compile|start|qt|build|clean]')
     parser.add_argument('path', help='Path to Ashiba project.')
     args_in = parser.parse_args()
 
@@ -270,4 +342,5 @@ def main():
      'start'  : _start,
      'clean'  : _clean,
      'qt'     : _qt,
+     'build'  : _build,
     }.get(command, _help)(args_in)
