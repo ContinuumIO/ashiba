@@ -1,4 +1,26 @@
+import yaml
 import collections
+
+def prettyaml(data, lvl=0, indent='  ', prefix=''):
+    if isinstance(data, basestring):
+        data = yaml.load(data)
+    if isinstance(data, dict):
+        if len(data) == 1:
+            k, v = data.items()[0]
+            out_str = '{}^{}:{}'.format(indent * lvl, k, v)
+        else:
+            out_str = '\n'.join(
+                ['{}{}:{}'.format(indent * lvl, k, prettyaml(v, lvl + 1)) 
+                    for k,v in data.items()])
+        out_str = '\n' + out_str
+    elif isinstance(data, list):
+        out_str = ''.join(['\n{}{}'.format(indent * (lvl - 1) , 
+            prettyaml(x, lvl, prefix='- ')) for x in data])
+    else:
+        out_str = "{0}{1}{2}".format(indent, prefix, data)
+
+    return out_str
+
 
 def autoviv():
     return collections.defaultdict(autoviv)
