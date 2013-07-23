@@ -8,6 +8,8 @@ import tempfile
 import os, os.path
 import multiprocessing as mp
 from contextlib import closing, contextmanager
+import socket
+import webbrowser
 
 import yaml
 
@@ -150,7 +152,7 @@ def clean_app_dir(path):
         if os.path.isdir(app_dir):
             print "CLEAN: {}".format(app_dir)
             shutil.rmtree(app_dir)
-    
+
     modified = os.path.join(path, '.modified.json')
     if os.path.isfile(modified):
         os.remove(modified)
@@ -159,6 +161,30 @@ def clean_app_dir(path):
         for fname in files:
             if fname.endswith('.pyc'):
                 os.remove(os.path.join(root, fname))
+
+def get_port(host, port):
+    # Logic borrowed from Tornado's bind_sockets
+
+    flags = socket.AI_PASSIVE
+    if hasattr(socket, "AI_ADDRCONFIG"):
+        flags |= socket.AI_ADDRCONFIG
+
+    while True:
+        try:
+            res = socket.getaddrinfo(host, port, socket.AF_UNSPEC, socket.SOCK_STREAM, 0,
+                flags)
+            af, socktype, proto, cannonname, sockaddr = res[0]
+
+            s = socket.socket(af, socktype, proto)
+
+            s.setblocking(0)
+            s.bind(sockaddr)
+            s.listen(128)
+        except socket.error as e:
+            print("Could not assign to port %s (%s)." % (port, e))
+            port += 1
+            continue
+        return port
 
 def _start(args):
     path = args.path
@@ -177,17 +203,21 @@ def _start(args):
 
     with closing(open(mtime_fname, 'w')) as mtime_file:
         json.dump(mtimes, mtime_file)
-    
+
     print "APP_PATH:", app_path
     sys.path.insert(0, app_path)
     os.chdir(app_path)
 
-    host, port = 'localhost', '12345'
+    host, port = 'localhost', get_port('localhost', 12345)
+    if args.open_browser:
+        url = "http://" + host + ':' + str(port) + "/"
+        webbrowser.open_new(url)
+
     import flask_loader
-    flask_loader.app.run(host=host, port=port, 
+    flask_loader.app.run(host=host, port=port,
                          debug       =True,
-                         threaded    =True, 
-                         use_reloader=False,)    
+                         threaded    =True,
+                         use_reloader=False,)
 
 @stay_put
 def compile_enaml(fpath):
@@ -297,7 +327,7 @@ def _build(args):
                         'type'   : 'web',
                         }
     if 'APP_ICON' in SETTINGS:
-        meta['app']['icon'] = os.path.join('ashiba', 
+        meta['app']['icon'] = os.path.join('ashiba',
                                 app_head, SETTINGS['APP_ICON'])
     if 'APP_SUMMARY' in SETTINGS:
         meta['app']['summary'] = SETTINGS['APP_SUMMARY']
@@ -340,17 +370,58 @@ def _help(args):
 
 def main():
     import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('command', 
-                    help='Ashiba command: [init|compile|start|qt|build|clean]')
-    parser.add_argument('path', help='Path to Ashiba project.')
-    args_in = parser.parse_args()
 
-    command = args_in.command
-    {'compile': _compile,
-     'init'   : _init,
-     'start'  : _start,
-     'clean'  : _clean,
-     'qt'     : _qt,
-     'build'  : _build,
-    }.get(command, _help)(args_in)
+    if len(sys.argv) == 1:
+        sys.argv.append('-h')
+
+    parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers()
+
+    init = subparsers.add_parser(
+        "init",
+        help="Initialize an empty Ashiba app",
+        )
+    init.set_defaults(func=_init)
+
+    compile = subparsers.add_parser(
+        "compile",
+        help="Compile an app",
+        )
+    compile.set_defaults(func=_compile)
+
+    start = subparsers.add_parser(
+        "start",
+        help="Run a compiled app in the browser",
+        )
+    start.add_argument(
+        "--open-browser",
+        default=False,
+        action="store_true",
+        help="Open the web browser (default=False)",
+        )
+    start.set_defaults(func=_start)
+
+    qt = subparsers.add_parser(
+        "qt",
+        help="Run a compiled app in qt",
+        )
+    qt.set_defaults(func=_qt)
+
+    build = subparsers.add_parser(
+        "build",
+        help="build",
+        )
+    build.set_defaults(func=_build)
+
+    clean = subparsers.add_parser(
+        "clean",
+        help="clean",
+        )
+    clean.set_defaults(func=_clean)
+
+    for subparser in (init, compile, start, qt, build, clean):
+        subparser.add_argument('path', help='Path to Ashiba project.')
+
+    args = parser.parse_args()
+
+    args.func(args)
