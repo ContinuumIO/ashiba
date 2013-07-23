@@ -367,26 +367,31 @@ def main():
         help="Initialize an empty Ashiba app",
         )
     init.set_defaults(func=_init)
+
     compile = subparsers.add_parser(
         "compile",
         help="Compile an app",
         )
     compile.set_defaults(func=_compile)
+
     start = subparsers.add_parser(
         "start",
         help="Run a compiled app in the browser",
         )
     start.set_defaults(func=_start)
+
     qt = subparsers.add_parser(
         "qt",
         help="Run a compiled app in qt",
         )
     qt.set_defaults(func=_qt)
+
     build = subparsers.add_parser(
         "build",
         help="build",
         )
     build.set_defaults(func=_build)
+
     clean = subparsers.add_parser(
         "clean",
         help="clean",
