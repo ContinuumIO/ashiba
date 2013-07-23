@@ -319,9 +319,19 @@ def _build(args):
     shutil.copytree(temp_dir, source_dir)
 
     with closing(open(os.path.join(build_dir, 'meta.yaml'), 'w')) as f_out:
-        f_out.write(yaml.dump(meta))
+        f_out.write(ashiba.utils.prettyaml(meta))
 
     ## TODO: Write build scripts
+
+    build_sh = """mkdir $PREFIX/ashiba/
+cp -r $RECIPE_DIR/src/* $PREFIX/ashiba/"""
+    with closing(open(os.path.join(build_dir, 'build.sh'), 'w')) as f_out:
+        f_out.write(build_sh)
+
+    build_bat = """md %PREFIX%\\ashiba
+xcopy %RECIPE_DIR%\\src\\* %PREFIX\\ashiba"""
+    with closing(open(os.path.join(build_dir, 'build.bat'), 'w')) as f_out:
+        f_out.write(build_bat)
 
 
 
