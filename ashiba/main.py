@@ -355,17 +355,47 @@ def _help(args):
 
 def main():
     import argparse
-    parser = argparse.ArgumentParser()
-    parser.add_argument('command',
-                    help='Ashiba command: [init|compile|start|qt|build|clean]')
-    parser.add_argument('path', help='Path to Ashiba project.')
-    args_in = parser.parse_args()
 
-    command = args_in.command
-    {'compile': _compile,
-     'init'   : _init,
-     'start'  : _start,
-     'clean'  : _clean,
-     'qt'     : _qt,
-     'build'  : _build,
-    }.get(command, _help)(args_in)
+    if len(sys.argv) == 1:
+        sys.argv.append('-h')
+
+    parser = argparse.ArgumentParser()
+    subparsers = parser.add_subparsers()
+
+    init = subparsers.add_parser(
+        "init",
+        help="Initialize an empty Ashiba app",
+        )
+    init.set_defaults(func=_init)
+    compile = subparsers.add_parser(
+        "compile",
+        help="Compile an app",
+        )
+    compile.set_defaults(func=_compile)
+    start = subparsers.add_parser(
+        "start",
+        help="Run a compiled app in the browser",
+        )
+    start.set_defaults(func=_start)
+    qt = subparsers.add_parser(
+        "qt",
+        help="Run a compiled app in qt",
+        )
+    qt.set_defaults(func=_qt)
+    build = subparsers.add_parser(
+        "build",
+        help="build",
+        )
+    build.set_defaults(func=_build)
+    clean = subparsers.add_parser(
+        "clean",
+        help="clean",
+        )
+    clean.set_defaults(func=_clean)
+
+    for subparser in (init, compile, start, qt, build, clean):
+        subparser.add_argument('path', help='Path to Ashiba project.')
+
+    args = parser.parse_args()
+
+    args.func(args)
