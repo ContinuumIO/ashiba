@@ -9,6 +9,7 @@ import os, os.path
 import multiprocessing as mp
 from contextlib import closing, contextmanager
 import socket
+import webbrowser
 
 import yaml
 
@@ -208,6 +209,10 @@ def _start(args):
     os.chdir(app_path)
 
     host, port = 'localhost', get_port('localhost', 12345)
+    if args.open_browser:
+        url = "http://" + host + ':' + str(port) + "/"
+        webbrowser.open_new(url)
+
     import flask_loader
     flask_loader.app.run(host=host, port=port,
                          debug       =True,
@@ -377,6 +382,12 @@ def main():
     start = subparsers.add_parser(
         "start",
         help="Run a compiled app in the browser",
+        )
+    start.add_argument(
+        "--open-browser",
+        default=False,
+        action="store_true",
+        help="Open the web browser (default=False)",
         )
     start.set_defaults(func=_start)
 
