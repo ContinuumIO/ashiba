@@ -8,6 +8,7 @@ import tempfile
 import os, os.path
 import multiprocessing as mp
 from contextlib import closing, contextmanager
+import socket
 
 import yaml
 
@@ -150,7 +151,7 @@ def clean_app_dir(path):
         if os.path.isdir(app_dir):
             print "CLEAN: {}".format(app_dir)
             shutil.rmtree(app_dir)
-    
+
     modified = os.path.join(path, '.modified.json')
     if os.path.isfile(modified):
         os.remove(modified)
@@ -159,6 +160,30 @@ def clean_app_dir(path):
         for fname in files:
             if fname.endswith('.pyc'):
                 os.remove(os.path.join(root, fname))
+
+def get_port(host, port):
+    # Logic borrowed from Tornado's bind_sockets
+
+    flags = socket.AI_PASSIVE
+    if hasattr(socket, "AI_ADDRCONFIG"):
+        flags |= socket.AI_ADDRCONFIG
+
+    while True:
+        try:
+            res = socket.getaddrinfo(host, port, socket.AF_UNSPEC, socket.SOCK_STREAM, 0,
+                flags)
+            af, socktype, proto, cannonname, sockaddr = res[0]
+
+            s = socket.socket(af, socktype, proto)
+
+            s.setblocking(0)
+            s.bind(sockaddr)
+            s.listen(128)
+        except socket.error as e:
+            print("Could not assign to port %s (%s).", port, e)
+            port += 1
+            continue
+        return port
 
 def _start(args):
     path = args.path
@@ -177,17 +202,17 @@ def _start(args):
 
     with closing(open(mtime_fname, 'w')) as mtime_file:
         json.dump(mtimes, mtime_file)
-    
+
     print "APP_PATH:", app_path
     sys.path.insert(0, app_path)
     os.chdir(app_path)
 
-    host, port = 'localhost', '12345'
+    host, port = 'localhost', get_port('localhost', 12345)
     import flask_loader
-    flask_loader.app.run(host=host, port=port, 
+    flask_loader.app.run(host=host, port=port,
                          debug       =True,
-                         threaded    =True, 
-                         use_reloader=False,)    
+                         threaded    =True,
+                         use_reloader=False,)
 
 @stay_put
 def compile_enaml(fpath):
@@ -297,7 +322,7 @@ def _build(args):
                         'type'   : 'web',
                         }
     if 'APP_ICON' in SETTINGS:
-        meta['app']['icon'] = os.path.join('ashiba', 
+        meta['app']['icon'] = os.path.join('ashiba',
                                 app_head, SETTINGS['APP_ICON'])
     if 'APP_SUMMARY' in SETTINGS:
         meta['app']['summary'] = SETTINGS['APP_SUMMARY']
@@ -331,7 +356,7 @@ def _help(args):
 def main():
     import argparse
     parser = argparse.ArgumentParser()
-    parser.add_argument('command', 
+    parser.add_argument('command',
                     help='Ashiba command: [init|compile|start|qt|build|clean]')
     parser.add_argument('path', help='Path to Ashiba project.')
     args_in = parser.parse_args()
