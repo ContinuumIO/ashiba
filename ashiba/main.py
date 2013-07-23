@@ -180,7 +180,7 @@ def get_port(host, port):
             s.bind(sockaddr)
             s.listen(128)
         except socket.error as e:
-            print("Could not assign to port %s (%s).", port, e)
+            print("Could not assign to port %s (%s)." % (port, e))
             port += 1
             continue
         return port
