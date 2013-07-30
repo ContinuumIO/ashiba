@@ -18,7 +18,7 @@ requirements:
     - matplotlib
     - python
     - numpy
-    - yaml
+    - pyyaml
 
 test:
   imports:
