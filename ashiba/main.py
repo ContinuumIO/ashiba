@@ -283,11 +283,12 @@ def _build(args):
     app_head = os.path.split(os.getcwd())[-1]
 
     meta = {}
-    meta['package'] = { 'name'    : SETTINGS['APP_NAME'],
+    meta['package'] = { 'name'    : app_head,
                         'version' : 0.0,
                         }
     meta['requirements'] = {}
-    meta['requirements']['build'] = meta['requirements']['run'] = [
+    meta['requirements']['build'] = ['python']
+    meta['requirements']['run'] = [
                         'python',
                         'pyside',
                         'matplotlib',
