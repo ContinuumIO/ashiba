@@ -328,7 +328,7 @@ def _build(args):
                         'type'   : 'web',
                         }
     if 'APP_ICON' in SETTINGS:
-        meta['app']['icon'] = os.path.join('ashiba',
+        meta['app']['icon'] = os.path.join('..', 'src',
                                 app_head, SETTINGS['APP_ICON'])
     if 'APP_SUMMARY' in SETTINGS:
         meta['app']['summary'] = SETTINGS['APP_SUMMARY']
@@ -348,20 +348,22 @@ def _build(args):
     shutil.copytree(os.getcwd(), temp_dir)
     clean_app_dir(temp_dir)
     shutil.copytree(temp_dir, source_dir)
+    os.mkdir(os.path.join(build_dir, 'conda-recipe'))
+    recipe_dir = os.path.join(build_dir, 'conda-recipe')
 
-    with closing(open(os.path.join(build_dir, 'meta.yaml'), 'w')) as f_out:
+    with closing(open(os.path.join(recipe_dir, 'meta.yaml'), 'w')) as f_out:
         f_out.write(ashiba.utils.prettyaml(meta))
 
-    ## TODO: Write build scripts
+    # These should probably be files in the current dir that get copied...
 
     build_sh = """mkdir $PREFIX/ashiba/
-cp -r $RECIPE_DIR/src/* $PREFIX/ashiba/"""
-    with closing(open(os.path.join(build_dir, 'build.sh'), 'w')) as f_out:
+cp -r $RECIPE_DIR/../src/* $PREFIX/ashiba/"""
+    with closing(open(os.path.join(recipe_dir, 'build.sh'), 'w')) as f_out:
         f_out.write(build_sh)
 
     build_bat = """md %PREFIX%\\ashiba
-xcopy %RECIPE_DIR%\\src\\* %PREFIX\\ashiba"""
-    with closing(open(os.path.join(build_dir, 'build.bat'), 'w')) as f_out:
+xcopy %RECIPE_DIR%\\..\\src\\* %PREFIX\\ashiba"""
+    with closing(open(os.path.join(recipe_dir, 'build.bat'), 'w')) as f_out:
         f_out.write(build_bat)
 
 
