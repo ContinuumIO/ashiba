@@ -51,7 +51,7 @@ var ashiba = {
                   + "       Value: " + domObj[element_name][property] + '\n'
         );
         if (property != '_meta'){
-          element[property] = domObj[element_name][property];
+          element.setAttribute(property, domObj[element_name][property]);
         } else {
           var meta = domObj[element_name]['_meta'];
           if (meta.innerHTML !== undefined){  
@@ -59,6 +59,11 @@ var ashiba = {
           }
         }
       });
+      var nn = element.nodeName.toLowerCase();
+      if (!(nn == 'input' || nn == 'select' || nn == 'textarea')
+          && element.hasAttribute('onchange')){
+        element.onchange();
+      }
     });
   },
 
@@ -99,7 +104,7 @@ var ashiba = {
 }
 
 $(document).ready(function(){
-  // Nice-ify sliders
+  /* Nice-ify sliders */
   $('input[type="range"]').after(function(){
     return ('&nbsp;<output for="' + this.id +'">' +
                     this.value +'</output>');
@@ -107,4 +112,10 @@ $(document).ready(function(){
     $('output[for="'+ this.id +'"]').val(this.value);
   });
 
+  /* Bless jQUI elements */
+  var uiElements = ['tabs', 'dialog'];
+  for (i=0;i<uiElements.length;i++){
+    var e = uiElements[i];
+    $('.jqui-' + e + ':not(.hide)')[e]();
+  }
 });
