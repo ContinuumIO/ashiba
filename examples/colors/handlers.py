@@ -11,8 +11,7 @@ def get_colors(dom):
 
 def set_colors(dom):
     R, G, B = get_colors(dom)
-    dom['tabs']['style'] = 'background-color:rgb({}, {}, {});'.format(
-        R, G, B)
+    dom['tabs'].style('background-color', 'rgb({}, {}, {})'.format(R, G, B))
 
 ## Wouldn't it be nice to use a class selector? 
 ## Perhaps single underscore? Or maybe move to decorators?
@@ -30,6 +29,9 @@ def slider_B__change(dom):
     return dom
 
 def btn_color__click(dom):
-    dom['dialog']['_meta']['innerHTML'] = "<p>This color is RGB({}, {}, {}).</p>"\
-        .format(*get_colors(dom))
+    dom['dialog'].body = "<p>This color is RGB({}, {}, {}).</p>".format(
+        *get_colors(dom))
+    dom['dialog'].add_class('spam')
+    #dom['dialog']['title'] = "Lovely Spam"
+    dom['dialog'].title = "Lovely Spam"
     return dom
