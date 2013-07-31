@@ -2,13 +2,18 @@
 var ashiba = {
   'getDom' : function(){
     var dom = {}; 
-    var inputs = $('input, select');
+    var inputs = $('input, select, .ashiba');
     for(i=0;i<inputs.length;i++){
       var element = inputs[i];
       if(!!element.id){
         dom[element.id] = {};
         var meta = {'nodeName' :element.nodeName,
-                    'innerHTML':element.innerHTML};
+                    'innerHTML':element.innerHTML}
+        if (element.className !== ''){
+          meta['class'] = element.className.split(/\s+/);
+        } else {
+          meta['class'] = [];
+        }
         dom[element.id]['_meta'] = meta;
         if (element.type === "checkbox"||
             element.type === "radio"){
@@ -17,26 +22,12 @@ var ashiba = {
           dom[element.id]['value'] = element.value;
         }
       }
-    }
 
-    /* This is for manually specifying other DOM object-properties to be
-     * visible. */
-    /*
-    var extras = $('.ashiba_visible, .ashiba-visible');
-    for(i=0;i<extras.length;i++){
-      if(!!extras[i].id){
-        var element = extras[i];
-        dom[element.id] = {};
-        var properties = element.ashiba.split(' ');
-        for(j=0;j<properties.length;j++){
-          var property = properties[j];
-          if(property){
-            dom[element.id][property] = element[property];
-          }
-        }
+      if (element.hasAttribute('data-visible')){
+        var dv = element.getAttribute('data-visible').split(/\s+/);
+        dv.forEach(function(x){dom[element.id][x] = element[x];});
       }
     }
-    */
 
     return JSON.stringify(dom);
   },
@@ -51,17 +42,28 @@ var ashiba = {
                   + "       Value: " + domObj[element_name][property] + '\n'
         );
         if (property != '_meta'){
-          element.setAttribute(property, domObj[element_name][property]);
+          element[property] = domObj[element_name][property];
         } else {
           var meta = domObj[element_name]['_meta'];
           if (meta.innerHTML !== undefined){  
             element.innerHTML = meta.innerHTML;
           }
+          for (i=0;!!meta['class'] && i<meta['class'].length;i++){
+            var className = meta['class'][i];
+            if (className[0] == '-'){
+              $(element).removeClass(className.slice(1));
+            } else if (className[0] == '+'){
+              $(element).addClass(className.slice(1));
+            }
+          }
+          if (!!meta['style']){
+            $(element).css(meta['style']);
+          }
         }
       });
       var nn = element.nodeName.toLowerCase();
       if (!(nn == 'input' || nn == 'select' || nn == 'textarea')
-          && element.hasAttribute('onchange')){
+          && !!element.onchange){
         element.onchange();
       }
     });
