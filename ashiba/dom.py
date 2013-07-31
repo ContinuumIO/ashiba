@@ -22,7 +22,22 @@ class GenericDomElement(dict):
     
     def inner_html(self):
         return None
-    
+
+    def add_class(self, class_name):
+        if class_name not in self['_meta'].setdefault('class', []):
+            self['_meta']['class'].append('+' + class_name)
+
+    def remove_class(self, class_name):
+        self['_meta'].setdefault('class', []).append('-' + class_name)
+
+    def style(self, prop=None, val=None):
+        if prop is None:
+            return self['_meta'].get('style', {})
+        elif val is None:
+            return self['_meta'].get('style', {}).get(prop)
+        else:
+            self['_meta'].setdefault('style', {})[prop] = val
+
     @classmethod
     def from_dict(cls, in_dict):
         return cls(in_dict)
@@ -43,10 +58,21 @@ class GenericDomElement(dict):
 _translate_node_name = {}
 
 def DomElement(node_name, *args, **kwargs):
-    cls = _translate_node_name.get(
-                node_name.lower(), GenericDomElement)
+    base_dict = dict(*args, **kwargs)
+    cls = None
+    if node_name.lower() in _translate_node_name:
+        cls = _translate_node_name[node_name.lower()]
+    else:
+        for class_name in base_dict.get('_meta', {}).get('class', []):
+            if class_name in _translate_node_name:
+                cls = _translate_node_name[class_name]
+                break
+        else:
+            cls = GenericDomElement
+
     obj = cls(*args, **kwargs)
-    obj['_meta']['nodeName'] = node_name
+    if node_name:
+        obj['_meta']['nodeName'] = node_name
     return obj
 
 def nodeName(node_name):
@@ -126,7 +152,28 @@ class Select(GenericDomElement):
         
     def list_items(self):
         return self._list_items
-    
+
+@nodeName('jqui-dialog')
+class Dialog(GenericDomElement):
+    def __init__(self, *args, **kwargs):
+        super(Dialog, self).__init__(*args, **kwargs)
+
+    @property
+    def title(self):
+        return self.get('title', '')
+
+    @title.setter
+    def title(self, t):
+        self['title'] = t
+
+    @property
+    def body(self):
+        return self['_meta'].get('innerHTML', '')
+
+    @body.setter
+    def body(self, b):
+        self['_meta']['innerHTML'] = b
+
 class Dom(collections.defaultdict):
     def __init__(self, *args, **kwargs):
         super(Dom, self).__init__(lambda: DomElement(''), *args, **kwargs)
