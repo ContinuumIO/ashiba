@@ -2,7 +2,7 @@
 var ashiba = {
   'getDom' : function(){
     var dom = {}; 
-    var inputs = $('input, select, .ashiba');
+    var inputs = $('input, select, [data-visible]');
     for(i=0;i<inputs.length;i++){
       var element = inputs[i];
       if(!!element.id){
