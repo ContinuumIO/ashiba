@@ -209,7 +209,7 @@ def _start(args):
     os.chdir(app_path)
 
     host, port = 'localhost', get_port('localhost', 12345)
-    if args.open_browser:
+    if vars(args).get('open_browser'):
         url = "http://" + host + ':' + str(port) + "/"
         webbrowser.open_new(url)
 
