@@ -1,0 +1,207 @@
+#------------------------------------------------------------------------------
+#  Copyright (c) 2013, Nucleic Development Team
+#
+# Distributed under the terms of the Modified BSD License.
+#
+# The full license is in the file COPYING.txt, distributed with this software.
+#------------------------------------------------------------------------------
+""" This example demonstrates the use of the advanced DockArea widget.
+
+The DockArea widget provides a canvas into which DockItems can be docked
+and undocked at will. The layout configuration of the area can be saved
+and restored using a form that can be easily serialized to json.
+
+Tabbed dock items can be torn out of the dock area by holding the shift
+key while dragging a tab.
+
+"""
+import cPickle
+
+from atom.api import Atom, ContainerList, Unicode
+
+from enaml.layout.api import (
+    HSplitLayout, VSplitLayout, TabLayout, InsertItem, hbox, vbox, spacer
+)
+from enaml.widgets.api import (
+    Window, Container, DockArea, DockItem, PushButton, Field, Html, Slider,
+    ObjectCombo, CheckBox, MultilineField
+)
+
+
+STYLES = {
+    'VS 2010': 'vs-2010',
+    'Grey Wind': 'grey-wind',
+    'New Moon': 'new-moon',
+    'Metro': 'metro',
+}
+
+
+class LineCollector(Atom):
+    """ A simple class used to generate event logging text.
+
+    """
+    #: The header to use as the first lines of the text.
+    HEADER = u'#   Item     Event Type            \n'\
+             u'-----------------------------------'
+
+    #: The output text of the collector; updated when data changes.
+    text = Unicode(HEADER)
+
+    #: The data for the collector. This is a list of 2-tuples of
+    #: the form (unicode, DockItemEvent.Type).
+    data = ContainerList()
+
+    def _observe_data(self, change):
+        self.update_text()
+
+    def update_text(self):
+        """ Regenerate the output text from the current data.
+
+        """
+        parts = []
+        count = len(self.data)
+        for index, (evt_type, name) in enumerate(reversed(self.data)):
+            parts.append((count - index, evt_type, name))
+        lines = [self.HEADER]
+        for item in parts:
+            num, name, enum = item
+            line = u'{0!s: <4}{1: <9}{2: <19}'.format(num, name, enum.name)
+            lines.append(line)
+        self.text = u'\n'.join(lines)
+
+
+enamldef MyDockArea(DockArea):
+    layout = HSplitLayout(
+        VSplitLayout(
+            HSplitLayout(
+                VSplitLayout('Item 1', 'Item 3'),
+                'Item 4',
+            ),
+            'Logger',
+        ),
+        VSplitLayout(
+            TabLayout('Item 6', 'Item 7', 'Item 8', 'Item 9'),
+            'Item 5',
+            'Item 2',
+        ),
+    )
+    DockItem:
+        name = 'Item 1'
+        title = name
+        Container:
+            Field: pass
+            Field: pass
+            Field: pass
+    DockItem:
+        name = 'Item 2'
+        title = name
+        Container:
+            PushButton: text = 'foo'
+            PushButton: text = 'bar'
+            PushButton: text = 'baz'
+    DockItem:
+        name = 'Item 3'
+        title = name
+        Container:
+            Html: source = '<h1><center>Hello World!</center></h1>'
+    DockItem:
+        name = 'Item 4'
+        title = name
+        Container:
+            Html: source = '<h1><center>Hello Enaml!</center></h1>'
+    DockItem:
+        name = 'Item 5'
+        title = name
+        Container:
+            Slider: pass
+            Slider: pass
+            Slider: pass
+    DockItem:
+        name = 'Item 6'
+        title = name
+        Container:
+            Html: source = u'<h1><center>Guten Tag!</center></h1>'
+    DockItem:
+        name = 'Item 7'
+        title = name
+        Container:
+            Field: pass
+            Field: pass
+            Field: pass
+            Field: pass
+    DockItem:
+        name = 'Item 8'
+        title = name
+        Container:
+            PushButton: text = 'spam'
+            PushButton: text = 'ham'
+            PushButton: text = 'green'
+            PushButton: text = 'eggs'
+    DockItem:
+        name = 'Item 9'
+        title = name
+        Container:
+            Html: source = '<h1><center>Bonjour!</center></h1>'
+    DockItem:
+        name = 'Logger'
+        title = 'Event Logger'
+        Container:
+            MultilineField:
+                attr collector = LineCollector()
+                name = 'line-collector'
+                text << collector.text
+                font = '9pt Courier'
+                read_only = True
+
+
+enamldef MyItem(DockItem): owner:
+    title = name
+    Container:
+        Field: text = owner.name
+        Field: text = owner.name
+        Field: text = owner.name
+        Field: text = owner.name
+
+
+enamldef Main(Window):
+    Container:
+        attr stored = None
+        padding = (0, 0, 0, 10)
+        constraints = [
+            hbox(
+                vbox(10, save_b, restore_b, add_b, style_c, c_box, spacer),
+                area,
+            )
+        ]
+        PushButton: save_b:
+            text = 'Save Layout'
+            clicked ::
+                layout = area.save_layout()
+                parent.stored = cPickle.dumps(layout, -1)
+        PushButton: restore_b:
+            text = 'Restore Layout'
+            enabled << stored is not None
+            clicked ::
+                layout = cPickle.loads(stored)
+                with area.suppress_dock_events():
+                    area.apply_layout(layout)
+        PushButton: add_b:
+            text = 'Add Items'
+            clicked ::
+                for _ in xrange(3):
+                    name = 'Item %d' % (len(area.children) + 1)
+                    MyItem(area, name=name)
+                    op = InsertItem(item=name, target='Item 1')
+                    area.update_layout(op)
+        ObjectCombo: style_c:
+            items = STYLES.keys()
+            selected = 'VS 2010'
+        CheckBox: c_box:
+            text = 'Enable Dock Events'
+            checked := area.dock_events_enabled
+        MyDockArea: area:
+            style << STYLES[style_c.selected]
+            dock_event ::
+                event = change['value']
+                field = area.find('line-collector')
+                field.collector.data.append((event.name, event.type))
