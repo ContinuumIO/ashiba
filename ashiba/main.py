@@ -67,7 +67,7 @@ def _compile(args):
         sys.path.insert(0, os.getcwd())
 
     import settings
-    SETTINGS = {k:v for k,v in settings.__dict__.items() \
+    SETTINGS = {k:v for k,v in vars(settings).items() \
                         if not k.startswith('__')}
     import handlers
 
@@ -119,7 +119,7 @@ def _compile(args):
     outfile = open(file_path, 'w')
     outfile.write("/* Compiled with Ashiba v{} */\n".format(ashiba.__version__))
     outfile.write("\n$(window).load(function(){")
-    fcn_names = [k for k in handlers.__dict__ if re.match('[\\w]+?__[\\w]+', k)]
+    fcn_names = [k for k in vars(handlers) if re.match('[\\w]+?__[\\w]+', k)]
 
     for fcn_name in fcn_names:
         print "--> Translating", fcn_name
@@ -247,14 +247,14 @@ def _qt(args):
         os.chdir(os.path.join(args.path, 'app'))
         sys.path.insert(0, os.getcwd())
         import settings
-        if 'QT_ICON' in settings.__dict__:
+        if 'QT_ICON' in vars(settings):
             icon = os.path.abspath(settings.QT_ICON)
-        elif 'APP_ICON' in settings.__dict__:
+        elif 'APP_ICON' in vars(settings):
             icon = os.path.abspath(settings.APP_ICON)
         else:
             icon = ''
 
-        if 'APP_NAME' in settings.__dict__:
+        if 'APP_NAME' in vars(settings):
             name = settings.APP_NAME
         else:
             name = os.path.split(args.path)[-1]
@@ -304,7 +304,7 @@ def _build(args):
         sys.path.insert(0, os.getcwd())
 
     import settings
-    SETTINGS = {k:v for k,v in settings.__dict__.items() \
+    SETTINGS = {k:v for k,v in vars(settings).items() \
                         if not k.startswith('__')}
 
     required_keys = ['APP_NAME']
