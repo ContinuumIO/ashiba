@@ -1,5 +1,6 @@
 import re
 import sys
+import copy
 import json
 import time
 import shutil
@@ -10,8 +11,6 @@ import multiprocessing as mp
 from contextlib import closing, contextmanager
 import socket
 import webbrowser
-
-import yaml
 
 import ashiba, ashiba.utils
 
@@ -120,7 +119,7 @@ def _compile(args):
     outfile = open(file_path, 'w')
     outfile.write("/* Compiled with Ashiba v{} */\n".format(ashiba.__version__))
     outfile.write("\n$(window).load(function(){")
-    fcn_names = [k for k in handlers.__dict__ if re.match('[\w]+?__[\w]+', k)]
+    fcn_names = [k for k in handlers.__dict__ if re.match('[\\w]+?__[\\w]+', k)]
 
     for fcn_name in fcn_names:
         print "--> Translating", fcn_name
@@ -207,10 +206,11 @@ def _start(args):
     print "APP_PATH:", app_path
     sys.path.insert(0, app_path)
     os.chdir(app_path)
-
-    host, port = 'localhost', get_port('localhost', 12345)
+    
+    initial_port = args.port
+    host, port = 'localhost', get_port('localhost', initial_port)
     if vars(args).get('open_browser'):
-        url = "http://" + host + ':' + str(port) + "/"
+        url = "http://{}:{}/".format(host, port)
         webbrowser.open_new(url)
 
     import flask_loader
@@ -236,9 +236,13 @@ def compile_enaml(fpath):
     out_file.close()
 
 def _qt(args):
-    url = 'http://localhost:12345'
-    server = mp.Process(target=_start, args=(args,))
+    initial_port = args.port
+    port = get_port('localhost', initial_port)
+    server_args = copy.deepcopy(args)
+    server_args.port = port
+    server = mp.Process(target=_start, args=(server_args,))
     server.start()
+    url = 'http://localhost:{}'.format(port)
     with stay():
         os.chdir(os.path.join(args.path, 'app'))
         sys.path.insert(0, os.getcwd())
@@ -424,6 +428,16 @@ def main():
 
     for subparser in (init, compile, start, qt, build, clean):
         subparser.add_argument('path', help='Path to Ashiba project.')
+
+    port_kwargs = { 
+        'dest':   'port',
+        'action': 'store',
+        'default': 12345,
+        'type':    int,
+        'help':   "Start the web server on this port (default=12345)",
+        }
+    for subparser in (start, qt):
+        subparser.add_argument('--port', **port_kwargs)
 
     args = parser.parse_args()
 
