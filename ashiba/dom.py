@@ -1,8 +1,30 @@
 import re
 import json
 import copy
+import uuid
 import collections
 from ashiba import utils
+
+from lxml import etree
+
+class Dom(collections.defaultdict):
+    def __init__(self, *args, **kwargs):
+        super(Dom, self).__init__(lambda: DomElement(''), *args, **kwargs)
+        for k in self:
+            self[k] = DomElement(self[k]['_meta']['nodeName'], self[k])
+        # Should this be in the to_dict method?
+        self.init_state = copy.deepcopy(self.to_dict())
+
+    def __repr__(self):
+        return "Dom(%s)" % dict(self.items())
+
+    def changes(self):
+        cur_state = self.to_dict()
+        return utils.dict_diff(cur_state, self.init_state)
+
+    def to_dict(self):
+        return {k:v.to_dict() for k,v in self.items()}
+
 
 class GenericDomElement(dict):
     def __init__(self, *args, **kwargs):
@@ -55,7 +77,9 @@ class GenericDomElement(dict):
     def to_json(self):
         return json.dumps(self.to_dict)
 
+
 _translate_node_name = {}
+
 
 def DomElement(node_name, *args, **kwargs):
     base_dict = dict(*args, **kwargs)
@@ -75,11 +99,13 @@ def DomElement(node_name, *args, **kwargs):
         obj['_meta']['nodeName'] = node_name
     return obj
 
+
 def nodeName(node_name):
     def decorator(cls):
         _translate_node_name[node_name.lower()] = cls
         return cls
     return decorator
+
 
 @nodeName('SELECT')
 class Select(GenericDomElement):
@@ -94,6 +120,8 @@ class Select(GenericDomElement):
         super(Select, self).__init__(*args, **kwargs)
         # Could probably be replaced with attr later
         self._list_items = []
+        ## Use lxml etrees in the future for this stuff
+        #self.list_items = [(x.attrib['value'], x.text) for x in e.findall('option')]
         list_item_template = '<option value=["\'](.*?)["\']>(.*?)</option>'
         self._list_items = re.findall(list_item_template,
                                       self['_meta']['innerHTML'])
@@ -153,6 +181,7 @@ class Select(GenericDomElement):
     def list_items(self):
         return self._list_items
 
+
 @nodeName('jqui-dialog')
 class Dialog(GenericDomElement):
     def __init__(self, *args, **kwargs):
@@ -174,20 +203,60 @@ class Dialog(GenericDomElement):
     def body(self, b):
         self['_meta']['innerHTML'] = b
 
-class Dom(collections.defaultdict):
-    def __init__(self, *args, **kwargs):
-        super(Dom, self).__init__(lambda: DomElement(''), *args, **kwargs)
-        for k in self:
-            self[k] = DomElement(self[k]['_meta']['nodeName'], self[k])
-        # Should this be in the to_dict method?
-        self.init_state = copy.deepcopy(self.to_dict())
-        
-    def __repr__(self):
-        return "Dom(%s)" % dict(self.items())
 
-    def changes(self):
-        cur_state = self.to_dict()
-        return utils.dict_diff(cur_state, self.init_state)
+@nodeName('jqui-tabs')
+class TabSet(GenericDomElement):
+    def __init__(self, *args, **kwargs):
+        super(TabSet, self).__init__(*args, **kwargs)
+        root = etree.fromstring(
+            '<div>' + self['_meta']['innerHTML'] + '</div>')
+        titles = [x.findtext('a') for x in root.find('ul').findall('li')]
+        bodies = [x.findtext('p') for x in root.findall('div')]
+        self.tabs = [Tab(t, b) for t, b in zip(titles, bodies)]
+        self.uuid_ = uuid.uuid4()
+        self.changed = False
+
+    def add_tab(self, title="", body=""):
+        self.tabs.append(Tab(title, body))
+        self.changed = True
+
+    def del_tab(self, idx):
+        del self.tabs[idx]
+        self.changed = True
+
+    def tab(self, idx):
+        return self.tabs[idx] 
+    
+    def empty(self):
+        self.tabs = []
+        self.changed = True
+
+    def inner_html(self):
+        li_template = '\t<li><a href="#tabs-{}_{}">{}</a></li>'
+        li_list = [li_template.format(self.uuid_, idx, tab.title)
+                for idx, tab in enumerate(self.tabs)]
+        ul_section = '<ul>\n{}\n</ul>'.format('\n'.join(li_list))
+        body_template = '<div id="#tabs-{}_{}"><p>{}</p></div>'
+        body_list = [body_template.format(self.uuid_, idx, tab.body)
+                for idx, tab in enumerate(self.tabs)]
+        body_section = '\n'.join(body_list)
+         
+        return ul_section + '\n' + body_section
 
     def to_dict(self):
-        return {k:v.to_dict() for k,v in self.items()}
+        if self.changed:
+            self['_meta']['eval'] = "$(this).tabs()"
+        return super(TabSet, self).to_dict()
+        
+
+class Tab(object):
+    def __init__(self, title="", body=""):
+        self.title = title
+        self.body = body
+
+    def __repr__(self):
+        if len(self.body) > 16:
+            body = self.body[:16] + '...'
+        else:
+            body = self.body
+        return "Tab({}, {})".format(self.title.__repr__(), body.__repr__())
