@@ -59,12 +59,23 @@ var ashiba = {
           if (!!meta['style']){
             $(element).css(meta['style']);
           }
+          if (!!meta['eval']){
+            console.log(element.id + " EVAL " + meta['eval']);
+            try{
+              $(element).each(function(){eval(meta['eval']);});
+            }catch(err){
+              console.log("ERROR in _meta.eval on element " 
+                + element.id + ':' + err);
+            }
+          }
         }
       });
-      var nn = element.nodeName.toLowerCase();
-      if (!(nn == 'input' || nn == 'select' || nn == 'textarea')
-          && !!element.onchange){
-        element.onchange();
+      if (element !== null){
+          var nn = element.nodeName.toLowerCase();
+          if (!(nn == 'input' || nn == 'select' || nn == 'textarea')
+              && !!element.onchange){
+            element.onchange();
+          }
       }
     });
   },
