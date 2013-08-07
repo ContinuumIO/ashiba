@@ -30,7 +30,7 @@ def fire_event(obj_id, event):
     
     try:
         dom = ashiba.dom.Dom(json.loads(request.data))
-        dom = fcn(dom)
+        fcn(dom)
     except ValueError, e:
         return e.message, 400
     
