@@ -185,7 +185,7 @@ def get_port(host, port):
             continue
         return port
 
-def _start(args):
+def compile_check(args):
     path = args.path
     app_path = os.path.abspath(os.path.join(path, 'app'))
 
@@ -195,13 +195,21 @@ def _start(args):
         old_mtimes = json.load(open(mtime_fname))
     except (IOError, ValueError):
         old_mtimes = {}
-    if not os.path.isdir(app_path) or mtimes != old_mtimes:
+    if (not os.path.isdir(app_path) 
+            or mtimes != old_mtimes 
+            or vars(args).get('recompile')):
         print "--- RECOMPILING before start ---"
         _compile(args)
         mtimes = get_mtimes(path)
 
     with closing(open(mtime_fname, 'w')) as mtime_file:
         json.dump(mtimes, mtime_file)
+
+def _start(args):
+    path = args.path
+    app_path = os.path.abspath(os.path.join(path, 'app'))
+
+    compile_check(args)
 
     print "APP_PATH:", app_path
     sys.path.insert(0, app_path)
@@ -236,6 +244,8 @@ def compile_enaml(fpath):
     out_file.close()
 
 def _qt(args):
+    compile_check(args)
+
     initial_port = args.port
     port = get_port('localhost', initial_port)
     server_args = copy.deepcopy(args)
@@ -430,7 +440,6 @@ def main():
         subparser.add_argument('path', help='Path to Ashiba project.')
 
     port_kwargs = { 
-        'dest':   'port',
         'action': 'store',
         'default': 12345,
         'type':    int,
@@ -438,6 +447,12 @@ def main():
         }
     for subparser in (start, qt):
         subparser.add_argument('--port', **port_kwargs)
+        subparser.add_argument(
+            "--recompile",
+            default=False,
+            action="store_true",
+            help="Force a recompile (default=False)",
+            )
 
     args = parser.parse_args()
 
