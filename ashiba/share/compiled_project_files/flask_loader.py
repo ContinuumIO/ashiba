@@ -12,7 +12,7 @@ import handlers
 import settings
 
 app = Flask(__name__)
-SETTINGS = {k:v for k,v in settings.__dict__.items() 
+SETTINGS = {k:v for k, v in vars(settings).items()
                     if not k.startswith('__')}
 
 @app.route('/event/<obj_id>/<event>', methods=['POST'])
@@ -47,9 +47,14 @@ def render_app():
         favicon = SETTINGS['FAVICON']
     else:
         favicon = SETTINGS.get('APP_ICON')
+
+    theme = SETTINGS.get('APP_THEME')
+
     app_name = SETTINGS.get('APP_NAME', 'My App')
+
     return render_template('myapp.html',
                             favicon=favicon,
+                            theme=theme,
                             app_name=app_name)
             
 if __name__ == "__main__":

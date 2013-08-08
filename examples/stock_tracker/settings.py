@@ -7,3 +7,8 @@ QT_ICON  = "static/img/ca_icon_256.png"
 
 # Those settings can be python expressions!
 DATA_FILES = [x for x in os.listdir('.') if x.endswith('.csv')]
+
+APP_THEME = "united"
+## Default installed themes:
+#  [amelia, cerulean, cyborg, flatly, journal, 
+#   readable, simplex, slate, spacelab, united,]
