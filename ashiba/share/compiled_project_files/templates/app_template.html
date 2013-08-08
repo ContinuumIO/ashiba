@@ -2,8 +2,11 @@
 <html lang="en">
 <head>
   <title>Ashiba: {{ app_name }}</title>
-  <link rel="stylesheet" href="static/bootstrap.css">
-  <link rel="stylesheet" href="static/{{ theme }}.css" />
+  <link rel="stylesheet" href="static/css/bootstrap.css">
+  {%- if theme %}
+  <link rel="stylesheet" href="static/css/{{ theme }}.css" />
+  {%- endif %}
+  <link rel="stylesheet" href="static/css/ashiba.css" />
   <link rel="icon" type="image/png" href="{{ favicon }}" />
 </head>
 
