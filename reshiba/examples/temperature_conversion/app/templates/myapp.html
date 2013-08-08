@@ -1,0 +1,18 @@
+{% extends "app_template.html" %}
+{% block content %}
+<div>
+  <form>
+    <fieldset>
+      <legend>Realtime Temperature Conversion</legend>
+      <span class="help-block">Change the temperature in either box.</span>
+      <label>Farenheit</label>
+      <input type="text" id="txt_farenheit" value="32 F" 
+        data-events="change" data-visible="value"/>
+      <label>Celsius</label>
+      <input type="text" id="txt_celsius" value="0 C" 
+        data-events="change" data-visible="value"/>
+    </fieldset>
+  </form>
+</div>
+
+{% endblock content %}
