@@ -47,9 +47,17 @@ def render_app():
         favicon = SETTINGS['FAVICON']
     else:
         favicon = SETTINGS.get('APP_ICON')
+    if SETTINGS.get('APP_THEME'):
+        theme = SETTINGS['APP_THEME']
+    else:
+        theme = SETTINGS.get('APP_THEME')
+    print SETTINGS
+    print theme
+    print '_______________--------'
     app_name = SETTINGS.get('APP_NAME', 'My App')
     return render_template('myapp.html',
                             favicon=favicon,
+                            theme=theme,
                             app_name=app_name)
             
 if __name__ == "__main__":

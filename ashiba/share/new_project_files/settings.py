@@ -2,3 +2,18 @@
 
 APP_NAME = "My Awesome Ashiba App"
 APP_ICON = "static/img/ca_icon.png"
+APP_THEME = "united"
+
+POSSIBLE_THEMES = """
+                Theme Choices:
+                amelia
+                cerulean
+                cyborg
+                flatly
+                journal
+                readable
+                simplex
+                slate
+                spacelab
+                united
+                """
