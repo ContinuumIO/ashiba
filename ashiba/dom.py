@@ -31,17 +31,17 @@ class GenericDomElement(dict):
         super(GenericDomElement, self).__init__(*args, **kwargs)
         if self.get('_meta') is None:
             self['_meta'] = {}
-    
+
     def __getitem__(self, key):
         try:
             return super(GenericDomElement, self).__getitem__(key)
         except KeyError:
             return None
-    
+
     def __repr__(self):
         return "{}({})".format(self.__class__.__name__,
                                dict(self.items()))
-    
+
     def inner_html(self):
         return None
 
@@ -63,17 +63,17 @@ class GenericDomElement(dict):
     @classmethod
     def from_dict(cls, in_dict):
         return cls(in_dict)
-    
+
     @classmethod
     def from_json(cls, in_json):
         return cls.from_dict(json.loads(in_json))
-    
+
     def to_dict(self):
         inner_html = self.inner_html()
         if inner_html:
             self['_meta']['innerHTML'] = inner_html
         return dict(self)
-    
+
     def to_json(self):
         return json.dumps(self.to_dict)
 
@@ -111,7 +111,7 @@ def nodeName(node_name):
 class Select(GenericDomElement):
     """
     A dropdown box. Add items to the dropdown with add_item/add_items.
-    
+
     Recommended events to bind:
         change
     """
@@ -125,14 +125,14 @@ class Select(GenericDomElement):
         list_item_template = '<option value=["\'](.*?)["\']>(.*?)</option>'
         self._list_items = re.findall(list_item_template,
                                       self['_meta']['innerHTML'])
-        
+
     def inner_html(self):
         list_item_template = '<option value="{}">{}</option>'
         inner_html = ""
         for pair in self._list_items:
             inner_html += list_item_template.format(*pair)
         return inner_html
-    
+
     # Non-superclass methods
     def add_item(self, value, text=None):
         """
@@ -154,7 +154,7 @@ class Select(GenericDomElement):
         elif text is None:
             text = value
         self._list_items.append((value, text))
-        
+
     def add_items(self, items):
         """
         Add multiple items to a dropdown. Accepts a list of items, either
@@ -164,20 +164,20 @@ class Select(GenericDomElement):
         """
         for item in items:
             self.add_item(item)
-    
+
     def empty(self):
         """
         Remove all items from the dropdown.
         """
         self._list_items = []
-    
+
     def remove_item(self, value):
         """
         Remove an item from the dropdown list by specifying its value.
         This will fail silently if that item is not in the list.
         """
         self._list_items = [x for x in self._list_items if x[0] != value]
-        
+
     def list_items(self):
         return self._list_items
 
@@ -204,6 +204,28 @@ class Dialog(GenericDomElement):
         self['_meta']['innerHTML'] = b
 
 
+def get_tab_info(root):
+    """
+    Returns the prefix, separator, and max index for a set of jQueryUI tabs
+    """
+    hrefs = [y.attrib['href'] for y in
+                [x.find('a') for x in root.find('ul').findall('li')]
+            ]
+    splits = [r.groups() for r in
+                [re.match('#(.*)([-_]+)(\d+)$', h) for h in hrefs]
+              if r]
+    names   = {s[0] for s in splits}
+    seps    = {s[1] for s in splits}
+    indices = [s[2] for s in splits]
+
+    if len(names) > 1:
+        raise ValueError("Tab names lack a common prefix")
+    elif len(names) == 0:
+        raise ValueError("Tab names seem to be missing")
+
+    return names.pop(), seps.pop(), max(indices)
+
+
 @nodeName('jqui-tabs')
 class TabSet(GenericDomElement):
     def __init__(self, *args, **kwargs):
@@ -213,7 +235,7 @@ class TabSet(GenericDomElement):
         titles = [x.findtext('a') for x in root.find('ul').findall('li')]
         bodies = [x.findtext('p') for x in root.findall('div')]
         self.tabs = [Tab(t, b) for t, b in zip(titles, bodies)]
-        self.uuid_ = uuid.uuid4()
+        self.id_prefix, self.id_sep, self.id_index = get_tab_info(root)
         self.changed = False
 
     def add_tab(self, title="", body=""):
@@ -225,29 +247,34 @@ class TabSet(GenericDomElement):
         self.changed = True
 
     def tab(self, idx):
-        return self.tabs[idx] 
-    
+        return self.tabs[idx]
+
     def empty(self):
         self.tabs = []
         self.changed = True
 
     def inner_html(self):
-        li_template = '\t<li><a href="#tabs-{}_{}">{}</a></li>'
-        li_list = [li_template.format(self.uuid_, idx, tab.title)
-                for idx, tab in enumerate(self.tabs)]
-        ul_section = '<ul>\n{}\n</ul>'.format('\n'.join(li_list))
-        body_template = '<div id="#tabs-{}_{}"><p>{}</p></div>'
-        body_list = [body_template.format(self.uuid_, idx, tab.body)
-                for idx, tab in enumerate(self.tabs)]
-        body_section = '\n'.join(body_list)
-         
-        return ul_section + '\n' + body_section
+        if not self.changed:
+            return self['_meta']['innerHTML']
+        else:
+            li_template = '\t<li><a href="#{}{}{}">{}</a></li>'
+            li_list = [li_template.format(
+                            self.id_prefix, self.id_sep, idx, tab.title)
+                       for idx, tab in enumerate(self.tabs)]
+            ul_section = '<ul>\n{}\n</ul>'.format('\n'.join(li_list))
+            body_template = '<div id="{}{}{}"><p>{}</p></div>'
+            body_list = [body_template.format(
+                            self.id_prefix, self.id_sep, idx, tab.body)
+                         for idx, tab in enumerate(self.tabs)]
+            body_section = '\n'.join(body_list)
+
+            return ul_section + '\n' + body_section
 
     def to_dict(self):
         if self.changed:
-            self['_meta']['eval'] = "$(this).tabs()"
+            self['_meta']['eval'] = "$(this).tabs('refresh');"
         return super(TabSet, self).to_dict()
-        
+
 
 class Tab(object):
     def __init__(self, title="", body=""):
