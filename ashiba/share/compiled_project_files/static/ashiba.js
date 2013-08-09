@@ -1,7 +1,7 @@
 //Should probably namespace this
 var ashiba = {
   'getDom' : function(){
-    var dom = {}; 
+    var dom = {};
     var inputs = $('input, select, [data-visible]');
     for(i=0;i<inputs.length;i++){
       var element = inputs[i];
@@ -36,6 +36,10 @@ var ashiba = {
     var domObj = jsonResponse["dom_changes"];
     Object.getOwnPropertyNames(domObj).forEach(function(element_name){
       var element = document.getElementById(element_name);
+      if (element === null){
+        throw "Error: Ashiba's handlers.py refers to an object named '" +
+          element_name + "' which does not exist in the DOM."
+      }
       Object.getOwnPropertyNames(domObj[element_name]).forEach(function(property){
         console.log("Element name: " + element_name + '\n'
                   + "    Property: " + property + '\n'
@@ -45,7 +49,7 @@ var ashiba = {
           element[property] = domObj[element_name][property];
         } else {
           var meta = domObj[element_name]['_meta'];
-          if (meta.innerHTML !== undefined){  
+          if (meta.innerHTML !== undefined){
             element.innerHTML = meta.innerHTML;
           }
           for (i=0;!!meta['class'] && i<meta['class'].length;i++){
@@ -64,7 +68,7 @@ var ashiba = {
             try{
               $(element).each(function(){eval(meta['eval']);});
             }catch(err){
-              console.log("ERROR in _meta.eval on element " 
+              console.log("ERROR in _meta.eval on element "
                 + element.id + ':\n>>> ' + err);
             }
           }
