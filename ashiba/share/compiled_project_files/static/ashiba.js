@@ -65,7 +65,7 @@ var ashiba = {
               $(element).each(function(){eval(meta['eval']);});
             }catch(err){
               console.log("ERROR in _meta.eval on element " 
-                + element.id + ':' + err);
+                + element.id + ':\n>>> ' + err);
             }
           }
         }
