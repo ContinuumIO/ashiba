@@ -1,0 +1,19 @@
+<!-- This is the HTML file where you lay out your app window. -->
+<!-- Use normal HTML with Bootstrap, make sure the objects you want to control
+     have id attributes, and starting with a div as the outer level is probably
+     good. -->
+<!-- You can delete this comment once you've read it. -->
+{% block content %}
+<table id="my_table" data-visible="true"></table>
+<a id="btn_load" class="btn">Load Data</a>
+{% endblock content %}
+
+{% block header %}
+  <link rel="stylesheet" href="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/css/jquery.dataTables.css"/>
+{% endblock header %}
+
+{% block footer %}
+<script
+  src="http://ajax.aspnetcdn.com/ajax/jquery.dataTables/1.9.4/jquery.dataTables.js">
+</script>
+{% endblock footer %}

@@ -305,3 +305,22 @@ class Image(GenericDomElement):
             self['src'] = "data:{},{}".format(mimetype, image)
         else:
             self['src'] = "data:{};{},{}".format(mimetype, encoding, image)
+
+@nodeName('TABLE')
+class DataTable(GenericDomElement):
+    def __init__(self, *args, **kwargs):
+        if 'data' in kwargs:
+            self.data = kwargs['data']
+            del kwargs['data']
+        else:
+            self.data = None
+        super(DataTable, self).__init__(*args, **kwargs)
+        self['_meta']['eval'] = "$(this).dataTable();"
+
+    def inner_html(self):
+        if 'dataframe' in str(type(self.data)).lower():
+            html = self.data.to_html(index=False)
+            return re.sub('\s+', ' ', html)
+        else:
+            return ''
+
