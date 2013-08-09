@@ -1,7 +1,7 @@
 import re
 import json
 import copy
-import uuid
+import mimetypes
 import collections
 from ashiba import utils
 
@@ -287,3 +287,21 @@ class Tab(object):
         else:
             body = self.body
         return "Tab({}, {})".format(self.title.__repr__(), body.__repr__())
+
+@nodeName('IMG')
+class Image(GenericDomElement):
+    def set_image(self, image, tipo='', encoding=None):
+        if tipo == '':
+            self['src'] = image
+        if not tipo.startswith('.'):
+            tipo = '.' + tipo
+
+        if tipo not in mimetypes.types_map:
+            raise ValueError(
+                "Mimetype not found for extension '{}'".format(tipo))
+
+        mimetype = mimetypes.types_map[tipo]
+        if encoding is None:
+            self['src'] = "data:{},{}".format(mimetype, image)
+        else:
+            self['src'] = "data:{};{},{}".format(mimetype, encoding, image)

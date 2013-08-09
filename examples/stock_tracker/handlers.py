@@ -10,9 +10,9 @@ import time
 import io
 
 import pandas as pd
-import matplotlib as mpl
-mpl.use('svg')
-import matplotlib.pyplot as plt
+
+import ashiba.plot
+from ashiba.plot import plt
 
 # Globals are okay, they load at server start.
 
@@ -28,20 +28,19 @@ def btn_update__click(dom):
     else:
         return dom
     df.sort(inplace=True)
-    bounds = [dom[x]['value'] if dom[x]['value'] else None 
-              for x in ['date_start', 'date_end']] 
+    bounds = [dom[x]['value'] if dom[x]['value'] else None
+              for x in ['date_start', 'date_end']]
     ts = df['Close'][bounds[0]:bounds[1]]
     if ts.any():
         try:
             ts.plot()
-            for win in [int(dom[x]['value']) 
+            for win in [int(dom[x]['value'])
                         for x in ['slider_window_1', 'slider_window_2']]:
                 pd.rolling_mean(ts, win).plot()
             plt.title("Weekly closing prices for {}".format(symbol))
-            
-            svg = io.StringIO()
-            plt.savefig(svg)
-            dom['div_plot']['innerHTML'] = svg.getvalue()
+
+            # get_svg is added by ashiba.plot
+            dom['img_plot'].set_image(plt.get_svg(), 'svg')
         finally:
             plt.close()
 
