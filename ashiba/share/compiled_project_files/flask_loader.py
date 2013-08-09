@@ -1,6 +1,7 @@
 import sys, os
 import copy
 import json
+import uuid
 import pprint
 
 import flask
@@ -22,18 +23,18 @@ def fire_event(obj_id, event):
     if not fcn:
         return 'Event function not found.', 404
     print "REQUEST RECEIVED:"
-    print pprint.pprint(request.data) 
+    print pprint.pprint(request.data)
     #An extra None gets printed here. Why?
     print ""
     if not request.data:
         return 'No data included.', 200
-    
+
     try:
         dom = ashiba.dom.Dom(json.loads(request.data))
         fcn(dom)
     except ValueError, e:
         return e.message, 400
-    
+
     dom_changes = dom.changes()
     print "DOM CHANGES:"
     pprint.pprint(dom_changes)
@@ -55,8 +56,10 @@ def render_app():
     return render_template('myapp.html',
                             favicon=favicon,
                             theme=theme,
-                            app_name=app_name)
-            
+                            app_name=app_name,
+                            uuid=uuid.uuid4(),
+                            )
+
 if __name__ == "__main__":
     print "Running webserver in dir:", os.getcwd()
     app.run(host='localhost', port=12345, debug=True) #, threaded=True)
