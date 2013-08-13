@@ -1,0 +1,68 @@
+from enaml.web.api import Window, Form, Label, Textbox, Button, Checkbox, Row, Column, Dropdown, Slider, Date, Hyperlink, Item, Input, List
+
+enamldef Main(Window):
+    Dropdown:
+        id = "select"
+        options = {"":"Select a car", "volvo":"Volvo", "saab":"Saab", "mercedes":"Mercedes", "audi": "Audi"}
+    Hyperlink:
+        id = "btn_shuffle"
+        type = "btn"
+        text = "Shuffle List"
+    Window:
+        List:
+            Item:
+                text = "Select your favorite color:"
+                Input:
+                    type = "color"
+            Item:
+                text = "Birthday:"
+                Input:
+                    type = "date"
+            Item:
+                text = "Birthday (date and time):"
+                Input:
+                    type = "datetime"
+            Item:
+                text = "Birthday (date and time):"
+                Input:
+                    type = "datetime-local"
+            Item:
+                text = "Select your favorite color:"
+                Input:
+                    type = "color"
+            Item:
+                text = "E-mail:"
+                Input:
+                    type = "email"
+            Item:
+                text = "Quantity (between 1 and 5):"
+                Input:
+                    type = "number"
+                    min = 1
+                    max = 5
+            Item:
+                text = "Points (between 1 and 10):"
+                Input:
+                    type = "range"
+                    min = 1
+                    max = 10
+            Item:
+                text = "Search Google:"
+                Input:
+                    type = "search"
+            Item:
+                text = "Telephone:"
+                Input:
+                    type = "tel"
+            Item:
+                text = "Select a time:"
+                Input:
+                    type = "time"
+            Item:
+                text = "Add your homepage:"
+                Input:
+                    type = "url"
+            Item:
+                text = "Select a week:"
+                Input:
+                    type = "week"

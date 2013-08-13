@@ -1,0 +1,43 @@
+
+from enaml.web.api import Window, Form, Label, Textbox, Button, Checkbox, Row, Column, Dropdown, Slider, Date, Hyperlink, Image
+
+enamldef Main(Window):
+    Row:
+        Column:
+            width = 3
+            Label:
+                text = "Select a stock"
+            Dropdown:
+                options = {"":"Select a stock", "AAPL":"Apple (AAPL)", "GOOG":"Google (GOOG)"}
+            Label:
+                text = "Rolling mean windows, in weeks"
+            Slider:
+                id = "slider_window_1"
+                value = 4
+                min = 1
+                max = 52
+            Slider:
+                id = "slider_window_2"
+                value = 4
+                min = 1
+                max = 52
+            Label:
+                text = "Start date"
+            Date:
+                id = "date_start"
+            Label:
+                text = "End date"
+            Date:
+                id = "date_end"
+            Hyperlink:
+                type = "btn"
+                id = "btn_update"
+                text = "Update"
+        Column:
+            width = 9
+            id = "div_plot"
+
+            Image:
+                id = "img_plot"
+                type = "text-center"
+                

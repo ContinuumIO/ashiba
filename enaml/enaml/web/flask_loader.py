@@ -1,0 +1,45 @@
+
+import os
+import json
+
+import flask
+import settings
+from flask import Flask, Response, redirect, render_template, request, url_for
+
+from geventwebsocket.handler import WebSocketHandler
+from gevent.pywsgi import WSGIServer
+
+from web_com import WebCom
+
+app = Flask(__name__, template_folder = os.getcwd() + '/templates')
+
+SETTINGS = {k:v for k,v in settings.__dict__.items() 
+                   if not k.startswith('__')}
+
+@app.route('/')
+def render_app():
+    if SETTINGS.get('FAVICON'):
+        favicon = SETTINGS['FAVICON']
+    else:
+        favicon = SETTINGS.get('APP_ICON')
+    app_name = SETTINGS.get('APP_NAME', 'My App')
+    return render_template('myapp.html',
+                            app_name=app_name)
+
+
+@app.route('/api', methods=['GET', 'POST'])
+def api():
+    if request.environ.get('wsgi.websocket'):
+        ws = request.environ['wsgi.websocket']
+        while True:
+            in_message = ws.receive()
+            print "MESSAGE RECEIVED:", in_message
+
+            WebCom.webtoEnaml(json.loads(in_message), ws) 
+    return
+
+def start():
+    print "Starting Server"
+    app.debug = True
+    http_server = WSGIServer(('',12345), app, handler_class=WebSocketHandler)
+    http_server.serve_forever()
