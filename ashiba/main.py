@@ -124,10 +124,14 @@ def _compile(args):
     for fcn_name in fcn_names:
         print "--> Translating", fcn_name
         name, event = fcn_name.rsplit('__', 1)
+        if name.startswith('_'):
+            selector = '.'
+        else:
+            selector = '#'
         jquery_string = """
-  $("#{name}").on("{event}",
+  $("{selector}{name}").on("{event}",
     ashiba.eventHandlerFactory("{name}", "{event}")
-  );""".format(name=name,event=event)
+  );""".format(selector=selector, name=name.lstrip('_'), event=event)
 
         outfile.write(jquery_string)
 
@@ -195,8 +199,8 @@ def compile_check(args):
         old_mtimes = json.load(open(mtime_fname))
     except (IOError, ValueError):
         old_mtimes = {}
-    if (not os.path.isdir(app_path) 
-            or mtimes != old_mtimes 
+    if (not os.path.isdir(app_path)
+            or mtimes != old_mtimes
             or vars(args).get('recompile')):
         print "--- RECOMPILING before start ---"
         _compile(args)
@@ -214,7 +218,7 @@ def _start(args):
     print "APP_PATH:", app_path
     sys.path.insert(0, app_path)
     os.chdir(app_path)
-    
+
     initial_port = args.port
     host, port = 'localhost', get_port('localhost', initial_port)
     if vars(args).get('open_browser'):
@@ -439,7 +443,7 @@ def main():
     for subparser in (init, compile, start, qt, build, clean):
         subparser.add_argument('path', help='Path to Ashiba project.')
 
-    port_kwargs = { 
+    port_kwargs = {
         'action': 'store',
         'default': 12345,
         'type':    int,

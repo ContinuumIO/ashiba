@@ -19,8 +19,11 @@ SETTINGS = {k:v for k, v in vars(settings).items()
 @app.route('/event/<obj_id>/<event>', methods=['POST'])
 def fire_event(obj_id, event):
     fcn_name = "{}__{}".format(obj_id, event)
-    fcn = handlers.__dict__.get(fcn_name)
-    if not fcn:
+    if fcn_name in vars(handlers):
+        fcn = vars(handlers)[fcn_name]
+    elif ('_' + fcn_name) in vars(handlers):
+        fcn = vars(handlers)['_' + fcn_name]
+    else:
         return 'Event function not found.', 404
     print "REQUEST RECEIVED:"
     print pprint.pprint(request.data)

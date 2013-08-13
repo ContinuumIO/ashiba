@@ -8,8 +8,52 @@
 import pandas as pd
 
 import ashiba
+import ashiba.plot
+from ashiba.plot import plt
 
 df = pd.DataFrame.from_csv('census_marriage.csv', index_col=None)
+"""
+Sex
+1       Male
+2       Female
 
-def btn_load__click(dom):
-    dom['my_table'] = ashiba.dom.DataTable(data=df)
+Status
+4       Divorced
+1       Married
+2       Married, Spouse Absent
+3       Separated
+6       Single
+0       Unknown
+5       Widowed
+"""
+
+#def btn_load__click(dom):
+def _plot_control__change(dom):
+    year = int(dom['slider_year']['value'])
+    sex = None
+    if dom['radio_male']['checked']:
+        sex = 1
+    elif dom['radio_female']['checked']:
+        sex = 2
+    if year == 1890 or sex is None:
+        return
+
+    subset = df[df.year == year][df.sex == sex][df.age >= 15]
+    pivot = subset.pivot('age', 'marst', 'people')
+    if 3 not in pivot:
+        pivot[3] = [0]*len(pivot)
+    dom['my_table'] = ashiba.dom.DataTable(data=subset)
+    pivot.plot(kind='bar', stacked=True, sort_columns=True)
+    gender = {1:'male', 2:'female'}[sex]
+    plt.title('Marriage records for year {}, {}'.format(year, gender))
+    statuses = ('Unknown',
+                'Married',
+                'Married, Spouse Absent',
+                'Separated',
+                'Divorced',
+                'Widowed',
+                'Single',
+                )
+    plt.legend(statuses)
+    dom['img_plot'].set_image(plt.get_svg(), 'svg')
+    plt.close()
