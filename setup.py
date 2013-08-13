@@ -44,7 +44,7 @@ ext_modules = [
 
 setup(
     name='enaml',
-    version='0.7.19',
+    version='0.7.20',
     author='The Nucleic Development Team',
     author_email='sccolbert@gmail.com',
     url='https://github.com/nucleic/enaml',
@@ -54,6 +54,7 @@ setup(
     install_requires=['distribute'],
     packages=find_packages(),
     package_data={
+        'enaml.applib': ['*.enaml'],
         'enaml.stdlib': ['*.enaml'],
         'enaml.qt.docking': [
             'dock_images/*.png',
