@@ -65,6 +65,7 @@ var ashiba = {
           }
           if (!!meta['eval']){
             console.log(element.id + " EVAL " + meta['eval']);
+            /* TODO: Put the following in a map if eval is a list */
             try{
               $(element).each(function(){eval(meta['eval']);});
             }catch(err){
