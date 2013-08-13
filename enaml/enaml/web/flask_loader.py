@@ -8,7 +8,7 @@ from flask import Flask, Response, redirect, render_template, request, url_for
 from geventwebsocket.handler import WebSocketHandler
 from gevent.pywsgi import WSGIServer
 
-from ashiba.main import get_port
+from ashiba.utils import get_port
 
 from web_com import WebCom
 
@@ -42,6 +42,6 @@ def api():
 def start():
     app.debug = True
     port = get_port('localhost', 12345)
-    print "Starting server on port %i" % port
+    print "Starting server on port %i from dir %s" % (port, os.getcwd())
     http_server = WSGIServer(('',port), app, handler_class=WebSocketHandler)
     http_server.serve_forever()
