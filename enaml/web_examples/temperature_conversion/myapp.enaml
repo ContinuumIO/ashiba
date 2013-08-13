@@ -7,11 +7,11 @@ enamldef Main(Window):
         text = "Fahrenheit: "
     Textbox: txtF:
         id = "txt_tempF"
-        value = "32.0"
+        value = "32"
         value :: txtC.value = str(round(((float(value) - 32) * 5) / 9))
     Label:
         text = "Celsius: "
     Textbox: txtC:
         id = "txt_tempC"
-        value = "0.0"
+        value = "0"
         value :: txtF.value = str(round(((float(value) * 9) / 5) + 32))
