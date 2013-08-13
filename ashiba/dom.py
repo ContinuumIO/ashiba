@@ -31,6 +31,7 @@ class GenericDomElement(dict):
         super(GenericDomElement, self).__init__(*args, **kwargs)
         if self.get('_meta') is None:
             self['_meta'] = {}
+        #utils.autovivify(self['_meta'])
 
     def __getitem__(self, key):
         try:
@@ -315,12 +316,24 @@ class DataTable(GenericDomElement):
         else:
             self.data = None
         super(DataTable, self).__init__(*args, **kwargs)
-        self['_meta']['eval'] = "$(this).dataTable();"
 
     def inner_html(self):
         if 'dataframe' in str(type(self.data)).lower():
             html = self.data.to_html(index=False)
+            html = re.sub('border="1"', '', html)
             return re.sub('\s+', ' ', html)
         else:
             return ''
 
+    def to_dict(self):
+        """
+        This is a hack here. We should be able to take care of it in init.
+        """
+        if self.data is not None:
+            dt_options = {'bDestroy': True,
+                          'bAutoWidth': True,
+                          'bLengthChange': False,
+                          }
+            self['_meta']['eval'] ="$(this).dataTable({});".format(
+                json.dumps(dt_options))
+        return super(DataTable, self).to_dict()
