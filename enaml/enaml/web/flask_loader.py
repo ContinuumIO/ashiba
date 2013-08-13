@@ -12,7 +12,10 @@ from ashiba.utils import get_port
 
 from web_com import WebCom
 
-app = Flask(__name__, template_folder = os.getcwd() + '/templates')
+app = Flask(__name__,
+            template_folder = os.path.join(os.getcwd(), 'templates'),
+            static_folder = os.path.join(os.getcwd(), 'static'),
+            )
 
 SETTINGS = {k:v for k,v in vars(settings).items()
                    if not k.startswith('__')}
