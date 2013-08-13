@@ -9,7 +9,6 @@ import tempfile
 import os, os.path
 import multiprocessing as mp
 from contextlib import closing, contextmanager
-import socket
 import webbrowser
 
 import ashiba, ashiba.utils
@@ -165,30 +164,6 @@ def clean_app_dir(path):
             if fname.endswith('.pyc'):
                 os.remove(os.path.join(root, fname))
 
-def get_port(host, port):
-    # Logic borrowed from Tornado's bind_sockets
-
-    flags = socket.AI_PASSIVE
-    if hasattr(socket, "AI_ADDRCONFIG"):
-        flags |= socket.AI_ADDRCONFIG
-
-    while True:
-        try:
-            res = socket.getaddrinfo(host, port, socket.AF_UNSPEC, socket.SOCK_STREAM, 0,
-                flags)
-            af, socktype, proto, cannonname, sockaddr = res[0]
-
-            s = socket.socket(af, socktype, proto)
-
-            s.setblocking(0)
-            s.bind(sockaddr)
-            s.listen(128)
-        except socket.error as e:
-            print("Could not assign to port %s (%s)." % (port, e))
-            port += 1
-            continue
-        return port
-
 def compile_check(args):
     path = args.path
     app_path = os.path.abspath(os.path.join(path, 'app'))
@@ -220,7 +195,7 @@ def _start(args):
     os.chdir(app_path)
 
     initial_port = args.port
-    host, port = 'localhost', get_port('localhost', initial_port)
+    host, port = 'localhost', ashiba.utils.get_port('localhost', initial_port)
     if vars(args).get('open_browser'):
         url = "http://{}:{}/".format(host, port)
         webbrowser.open_new(url)
@@ -251,7 +226,7 @@ def _qt(args):
     compile_check(args)
 
     initial_port = args.port
-    port = get_port('localhost', initial_port)
+    port = ashiba.utils.get_port('localhost', initial_port)
     server_args = copy.deepcopy(args)
     server_args.port = port
     server = mp.Process(target=_start, args=(server_args,))

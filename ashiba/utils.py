@@ -1,4 +1,5 @@
 import yaml
+import socket
 import collections
 
 def prettyaml(data, lvl=0, indent='  ', prefix=''):
@@ -10,16 +11,41 @@ def prettyaml(data, lvl=0, indent='  ', prefix=''):
             out_str = '{}^{}:{}'.format(indent * lvl, k, v)
         else:
             out_str = '\n'.join(
-                ['{}{}:{}'.format(indent * lvl, k, prettyaml(v, lvl + 1)) 
+                ['{}{}:{}'.format(indent * lvl, k, prettyaml(v, lvl + 1))
                     for k,v in data.items()])
         out_str = '\n' + out_str
     elif isinstance(data, list):
-        out_str = ''.join(['\n{}{}'.format(indent * (lvl - 1) , 
+        out_str = ''.join(['\n{}{}'.format(indent * (lvl - 1) ,
             prettyaml(x, lvl, prefix='- ')) for x in data])
     else:
         out_str = "{0}{1}{2}".format(indent, prefix, data)
 
     return out_str
+
+
+def get_port(host, port):
+    # Logic borrowed from Tornado's bind_sockets
+
+    flags = socket.AI_PASSIVE
+    if hasattr(socket, "AI_ADDRCONFIG"):
+        flags |= socket.AI_ADDRCONFIG
+
+    while True:
+        try:
+            res = socket.getaddrinfo(host, port, socket.AF_UNSPEC, socket.SOCK_STREAM, 0,
+                flags)
+            af, socktype, proto, cannonname, sockaddr = res[0]
+
+            s = socket.socket(af, socktype, proto)
+
+            s.setblocking(0)
+            s.bind(sockaddr)
+            s.listen(128)
+        except socket.error as e:
+            print("Could not assign to port %s (%s)." % (port, e))
+            port += 1
+            continue
+        return port
 
 
 def autoviv():
