@@ -1,4 +1,3 @@
-
 import os
 import json
 
@@ -9,11 +8,13 @@ from flask import Flask, Response, redirect, render_template, request, url_for
 from geventwebsocket.handler import WebSocketHandler
 from gevent.pywsgi import WSGIServer
 
+from ashiba.main import get_port
+
 from web_com import WebCom
 
 app = Flask(__name__, template_folder = os.getcwd() + '/templates')
 
-SETTINGS = {k:v for k,v in settings.__dict__.items() 
+SETTINGS = {k:v for k,v in vars(settings).items()
                    if not k.startswith('__')}
 
 @app.route('/')
@@ -35,11 +36,12 @@ def api():
             in_message = ws.receive()
             print "MESSAGE RECEIVED:", in_message
 
-            WebCom.webtoEnaml(json.loads(in_message), ws) 
+            WebCom.webtoEnaml(json.loads(in_message), ws)
     return
 
 def start():
-    print "Starting Server"
     app.debug = True
-    http_server = WSGIServer(('',12345), app, handler_class=WebSocketHandler)
+    port = get_port('localhost', 12345)
+    print "Starting server on port %i" % port
+    http_server = WSGIServer(('',port), app, handler_class=WebSocketHandler)
     http_server.serve_forever()
