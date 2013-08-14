@@ -39,10 +39,11 @@ def _plot_control__change(dom):
         return
 
     subset = df[df.year == year][df.sex == sex][df.age >= 15]
+    # Does this need to be a new instantiation?
+    dom['my_table'] = ashiba.dom.DataTable(data=subset)
     pivot = subset.pivot('age', 'marst', 'people')
     if 3 not in pivot:
         pivot[3] = [0]*len(pivot)
-    dom['my_table'] = ashiba.dom.DataTable(data=subset)
     pivot.plot(kind='bar', stacked=True, sort_columns=True)
     gender = {1:'male', 2:'female'}[sex]
     plt.title('Marriage records for year {}, {}'.format(year, gender))

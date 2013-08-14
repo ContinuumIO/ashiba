@@ -96,7 +96,7 @@ var ashiba = {
 
   'eventHandlerFactory' : function (objName, eventName){
     return function(){
-      console.log("Received event #" + objName + ":" + eventName);
+      console.log("Received event " + objName + ":" + eventName);
       $.ajax({
         url: "event/" + objName + "/" + eventName,
         type: 'POST',

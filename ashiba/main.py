@@ -146,8 +146,11 @@ def _init(args):
     shutil.copytree(os.path.join(ASHIBA_SHARE, 'new_project_files'), path)
 
 def _clean(args):
-    path = args.path
-    clean_app_dir(path)
+    for path in args.paths:
+        if os.path.isdir(path):
+            clean_app_dir(path)
+        else:
+            print '"{}" is not a directory. Skipping.'.format(path)
 
 def clean_app_dir(path):
     for app_dir in [os.path.join(path, d) for d in ['app', 'build']]:
@@ -415,8 +418,10 @@ def main():
         )
     clean.set_defaults(func=_clean)
 
-    for subparser in (init, compile, start, qt, build, clean):
+    for subparser in (init, compile, start, qt, build):
         subparser.add_argument('path', help='Path to Ashiba project.')
+
+    clean.add_argument('paths', nargs='+', help='Paths to Ashiba projects.')
 
     port_kwargs = {
         'action': 'store',
