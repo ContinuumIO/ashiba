@@ -4,11 +4,26 @@ ashiba
 Ashiba seeks to be an app building framework, allowing you to define layout with HTML or Enaml and write logic in Python.
 No Javascript needed!
 
+## Dependencies
+* The only hard dependencies are Python 2.7 and *pyyaml*.
+* To run all of the examples, you should also have *numpy* and *pandas* installed.
+* In order to make use of the `build` functionality, you need *conda*.
+* For the best overall experience, use the [Anaconda](https://store.continuum.io/cshop/anaconda/) Python distribution
+
 ## Getting Ashiba
 
-0. The only hard dependencies are Python 2.7 and `pyyaml`.
 1. Clone this repo.
 2. Execute `python setup.py install` or `python setup.py develop`, as desired.
+
+## How to run an Ashiba app
+The `examples` folder contains several prewritten apps which showcase the workflow and capabilities of Ashiba.
+After you have Ashiba installed, just run
+    
+    ashiba start path/to/app
+    
+for example, from the root of this repo:
+
+    ashiba start examples/dataframes
 
 ## How to write an Ashiba app
 ### First steps
