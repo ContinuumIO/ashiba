@@ -1,5 +1,5 @@
 
-from atom.api import Unicode
+from atom.api import Unicode, Dict
 
 from enaml.core.declarative import d_
 
@@ -13,6 +13,8 @@ class Date(HTMLObject):
     text = d_(Unicode())
     id = d_(Unicode())
 
+    date = d_(Dict())
+
     def initialize(self):
         super(Date, self).initialize()
 
@@ -25,3 +27,7 @@ class Date(HTMLObject):
             self.addAttributes(type = "date", id = self.id)
 
         return super(Date, self).buildHTML(*args)
+
+    #@observe(('date'))
+    def _update_web(self, change):
+        super(Date, self)._update_web(change)

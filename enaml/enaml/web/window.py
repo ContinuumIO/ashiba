@@ -6,6 +6,7 @@ from enaml.core.declarative import d_
 from html_generator import HTMLGenerator
 from html_object import HTMLObject
 
+import lxml
 from lxml.html import builder as E
 
 class Window(HTMLObject):
@@ -30,6 +31,15 @@ class Window(HTMLObject):
         htmlGenerator.addHTML(htmlGenerator.buildChildren(self))
         htmlGenerator.dumpHTML()
         self.initialize()
+
+    def generateHTML(self):
+        htmlGenerator = HTMLGenerator()
+        htmlGenerator.addHTML(htmlGenerator.buildChildren(self))
+        print lxml.html.tostring(htmlGenerator.getHTML())
+        with open('myapp.html', 'w') as f:
+            f.write(lxml.html.tostring(htmlGenerator.getHTML()))
+
+
         
 
     

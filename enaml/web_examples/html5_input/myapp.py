@@ -1,16 +1,16 @@
 
 import enaml
-from enaml.web.api import WebApplication
+#from enaml.web.api import WebApplication
 
 def main():
     with enaml.imports():
         from myapp import Main
 
     view = Main()
-    view.show()
+    view.generateHTML()
     
-    app = WebApplication()
-    app.start()
+    #app = WebApplication()
+    #app.start()
 
 if __name__ == "__main__":
     main()

@@ -15,6 +15,9 @@ class HTMLGenerator:
 	def addHTML(self, *args):
 		self.html = E.HTML(*args)
 
+	def getHTML(self):
+		return self.html
+		
 	def dumpHTML(self):
 		print etree.tostring(self.html)
 		with open(os.getcwd() + '/templates/myapp.html', 'w') as f:

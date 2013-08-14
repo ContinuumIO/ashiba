@@ -19,7 +19,7 @@ class Image(HTMLObject):
     def buildHTML(self, *args):
         self.addTags()
         self.addText(self.text)
-        kwargs = {'class': self.type, 'id': self.id, 'ashiba': self.ashiba}
+        kwargs = {'class': self.type, 'id': self.id}
         self.addAttributes(**kwargs)
 
         return super(Image, self).buildHTML(*args)
