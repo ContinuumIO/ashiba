@@ -10,24 +10,9 @@ import urllib2
 def get_colors(dom):
     return [dom[x]['value'] for x in ['slider_R', 'slider_G', 'slider_B']]
 
-def set_colors(dom):
+def _color_control__change(dom):
     R, G, B = get_colors(dom)
     dom['my_tabs'].style('background-color', 'rgb({}, {}, {})'.format(R, G, B))
-
-## Wouldn't it be nice to use a class selector? 
-## Perhaps single underscore? Or maybe move to decorators?
-
-def slider_R__change(dom):
-    set_colors(dom)
-    return dom
-
-def slider_G__change(dom):
-    set_colors(dom)
-    return dom
-
-def slider_B__change(dom):
-    set_colors(dom)
-    return dom
 
 def btn_color__click(dom):
     dom['dialog'].body = "<p>This color is RGB({}, {}, {}).</p>".format(
