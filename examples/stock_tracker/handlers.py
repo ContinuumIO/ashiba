@@ -16,8 +16,8 @@ from ashiba.plot import plt
 
 # Globals are okay, they load at server start.
 
-AAPL = pd.DataFrame.from_csv("aapl.csv")
-GOOG = pd.DataFrame.from_csv("goog.csv")
+AAPL = pd.DataFrame.from_csv("aapl.csv").sort()
+GOOG = pd.DataFrame.from_csv("goog.csv").sort()
 
 def btn_update__click(dom):
     symbol = dom['select_stock']['value']
@@ -27,7 +27,6 @@ def btn_update__click(dom):
         df = GOOG
     else:
         return dom
-    df.sort(inplace=True)
     bounds = [dom[x]['value'] if dom[x]['value'] else None
               for x in ['date_start', 'date_end']]
     ts = df['Close'][bounds[0]:bounds[1]]
