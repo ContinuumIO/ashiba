@@ -1,7 +1,7 @@
 import ashiba   
 from ashiba.plot import plt
 
-from github import daily_commit_timeline, weekly_commit_timeline, additions_deletions_per_week
+from github import daily_commit_timeline, weekly_commit_timeline
 
 def mybutton__click(dom):
 
