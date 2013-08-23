@@ -16,6 +16,8 @@ app = Flask(__name__)
 SETTINGS = {k:v for k, v in vars(settings).items()
                     if not k.startswith('__')}
 
+debug = SETTINGS['DEBUG']
+
 @app.route('/event/<obj_id>/<event>', methods=['POST'])
 def fire_event(obj_id, event):
     fcn_name = "{}__{}".format(obj_id, event)
@@ -26,22 +28,29 @@ def fire_event(obj_id, event):
     else:
         return 'Event function not found.', 404
     print "REQUEST RECEIVED:"
-    print pprint.pprint(request.data)
-    #An extra None gets printed here. Why?
-    print ""
+    if debug:
+        print pprint.pprint(request.data)
+        #An extra None gets printed here. Why?
+        print ""
+    
     if not request.data:
+        print "Error: no data sent in request."
         return 'No data included.', 200
 
     try:
         dom = ashiba.dom.Dom(json.loads(request.data))
         fcn(dom)
     except ValueError, e:
+        print e.message
         return e.message, 400
 
     dom_changes = dom.changes()
-    print "DOM CHANGES:"
-    pprint.pprint(dom_changes)
-    print ""
+    if debug:
+        print "DOM CHANGES:"
+        pprint.pprint(dom_changes)
+        print ""
+    
+    print "SENDING RESPONSE..."
     return flask.jsonify({'success'    :True,
                           'dom_changes':dom_changes})
 

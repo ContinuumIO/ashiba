@@ -1,4 +1,6 @@
 //Should probably namespace this
+debug = false;
+
 var ashiba = {
   'getDom' : function(){
     var dom = {};
@@ -41,10 +43,12 @@ var ashiba = {
           element_name + "' which does not exist in the DOM."
       }
       Object.getOwnPropertyNames(domObj[element_name]).forEach(function(property){
-        console.log("Element name: " + element_name + '\n'
-                  + "    Property: " + property + '\n'
-                  + "       Value: " + domObj[element_name][property] + '\n'
-        );
+      	if (debug) {
+        	console.log("Element name: " + element_name + '\n'
+            	      + "    Property: " + property + '\n'
+                	  + "       Value: " + domObj[element_name][property] + '\n'
+        	);
+        }
         if (property != '_meta'){
           element[property] = domObj[element_name][property];
         } else {
@@ -97,14 +101,16 @@ var ashiba = {
   'eventHandlerFactory' : function (objName, eventName){
     return function(){
       console.log("Received event " + objName + ":" + eventName);
+      d = ashiba.getDom();
       $.ajax({
         url: "event/" + objName + "/" + eventName,
         type: 'POST',
-        data: ashiba.getDom(),
-        dataType: 'json'
+        data: d,
+        dataType: 'json',
+        contentType: "application/json"
       }).done(function(data){
-        console.log("AJAX success, setting DOM elements: "
-            + JSON.stringify(data));
+        console.log("AJAX success, setting DOM elements.");
+        //console.log("Response Data: " + JSON.stringify(data));
         ashiba.setDom(data);
       }).fail(function(data){
         debugStr = data.responseText;
