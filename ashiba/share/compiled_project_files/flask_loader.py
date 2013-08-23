@@ -16,8 +16,11 @@ app = Flask(__name__)
 SETTINGS = {k:v for k, v in vars(settings).items()
                     if not k.startswith('__')}
 
-debug = SETTINGS['DEBUG']
-
+try:
+    debug = SETTINGS['DEBUG']
+except:
+    debug = False
+    
 @app.route('/event/<obj_id>/<event>', methods=['POST'])
 def fire_event(obj_id, event):
     fcn_name = "{}__{}".format(obj_id, event)
