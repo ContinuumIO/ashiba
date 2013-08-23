@@ -408,13 +408,13 @@ def main():
 
     build = subparsers.add_parser(
         "build",
-        help="build",
+        help="Create a conda-recipe of the web app in place in build/",
         )
     build.set_defaults(func=_build)
 
     clean = subparsers.add_parser(
         "clean",
-        help="clean",
+        help="clean up the files created during the build command",
         )
     clean.set_defaults(func=_clean)
 
