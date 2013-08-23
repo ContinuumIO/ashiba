@@ -1,3 +1,8 @@
+#maincontainer {
+	margin-top: 15px;
+	margin-bottom: 15px;
+}
+
 .roundedcorners-top{
   -moz-border-radius-topleft: 8px;
   border-top-left-radius: 8px;
@@ -21,12 +26,16 @@
   -moz-box-shadow: 0 0 25px rgba(0,0,0,0.25); 
   box-shadow: 0 0 25px  rgba(0, 0, 0, 0.25);
 }
-.container{
-  background-color: rgba(255,255,255,0.9);
-}
+
 .center-box{
   display: inline-block;
   margin: auto;
   text-align:center;
   padding-top: 10px;
+}
+
+.center {
+     float: none;
+     margin-left: auto;
+     margin-right: auto;
 }
