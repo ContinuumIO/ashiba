@@ -5,8 +5,14 @@
 <!-- You can delete this comment once you've read it. -->
 
 <div class="row">
-  <div class="span3" id="div_control">
-    <label>Select a stock</label>
+	<div class="span12">
+		<h3>Stock Tracker</h3>
+		<p>Select input values then click on the Load Chart button.</p>
+	</div>
+</div>
+<hr>
+<div class="row">
+  <div class="span4" id="div_control">
     <select id="select_stock">
       <option value="">Select a stock</option>
       <option value="AAPL">Apple (AAPL)</option>
@@ -15,13 +21,17 @@
     <label>Rolling mean windows, in weeks</label>
     <input id="slider_window_1" type="range" value="4"  min="1" max="52">
     <input id="slider_window_2" type="range" value="20" min="1" max="52">
+    
+    <hr>
+    <h5>Optional Date Range</h5>
+    <h6>(08/19/2004 - 07/01/2013)</h6>
     <label>Start date</label>
     <input type="date" id="date_start">
     <label>End date</label>
     <input type="date" id="date_end">
-    <a href="#" class="btn" id="btn_update">Update</a>
+    <a href="#" class="btn btn-primary" id="btn_update">Load Chart</a>
   </div><!-- #div-control -->
-  <div class="span9" id="div_plot">
-    <img id="img_plot" class="text-center" data-visible="true"></img> 
+  <div class="span8" id="div_plot">
+    <img id="img_plot" class="text-center" data-visible="true"></img>
   <div><!-- #div-plot -->
 </div><!--.row-->
