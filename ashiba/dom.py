@@ -61,6 +61,12 @@ class GenericDomElement(dict):
         else:
             self['_meta'].setdefault('style', {})[prop] = val
 
+    def attr(self, name=None, value=None):
+        if name is None or value is None:
+            raise TypeError("attr requires two values, name and value")
+        self[name] = value
+        
+
     @classmethod
     def from_dict(cls, in_dict):
         return cls(in_dict)
