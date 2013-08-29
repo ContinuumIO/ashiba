@@ -1,0 +1,181 @@
+<style>
+
+    /* GLOBAL STYLES
+    -------------------------------------------------- */
+    /* Padding below the footer and lighter body text */
+
+    body {
+      padding-bottom: 40px;
+      color: #5a5a5a;
+    }
+
+
+    /* CUSTOMIZE THE CAROUSEL
+    -------------------------------------------------- */
+
+    /* Carousel base class */
+    .carousel {
+      margin-bottom: 60px;
+    }
+
+    .carousel .container {
+      position: relative;
+      z-index: 9;
+    }
+
+    .carousel-control {
+      height: 80px;
+      margin-top: 0;
+      font-size: 120px;
+      text-shadow: 0 1px 1px rgba(0,0,0,.4);
+      background-color: transparent;
+      border: 0;
+      z-index: 10;
+    }
+
+    .carousel .item {
+      height: 500px;
+    }
+    .carousel img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      min-width: 100%;
+      height: 500px;
+    }
+
+    .carousel-caption {
+      background-color: transparent;
+      position: static;
+      max-width: 550px;
+      padding: 0 20px;
+      margin-top: 200px;
+    }
+    .carousel-caption h1,
+    .carousel-caption .lead {
+      margin: 0;
+      line-height: 1.25;
+      color: #fff;
+      text-shadow: 0 1px 1px rgba(0,0,0,.4);
+    }
+    .carousel-caption .btn {
+      margin-top: 10px;
+    }
+
+
+
+    /* MARKETING CONTENT
+    -------------------------------------------------- */
+
+    /* Center align the text within the three columns below the carousel */
+    .marketing .span4 {
+      text-align: center;
+    }
+    .marketing h2 {
+      font-weight: normal;
+    }
+    .marketing .span4 p {
+      margin-left: 10px;
+      margin-right: 10px;
+    }
+
+
+    /* Featurettes
+    ------------------------- */
+
+    .featurette-divider {
+      margin: 80px 0; /* Space out the Bootstrap <hr> more */
+    }
+    .featurette {
+      padding-top: 120px; /* Vertically center images part 1: add padding above and below text. */
+      overflow: hidden; /* Vertically center images part 2: clear their floats. */
+    }
+    .featurette-image {
+      margin-top: -120px; /* Vertically center images part 3: negative margin up the image the same amount of the padding to center it. */
+    }
+
+    /* Give some space on the sides of the floated elements so text doesn't run right into it. */
+    .featurette-image.pull-left {
+      margin-right: 40px;
+    }
+    .featurette-image.pull-right {
+      margin-left: 40px;
+    }
+
+    /* Thin out the marketing headings */
+    .featurette-heading {
+      font-size: 40px;
+      font-weight: 300;
+      line-height: 1;
+      letter-spacing: -1px;
+    }
+
+    .cube {
+        margin: 2px;
+        width:75px;
+        height:75px;
+        float:left;
+        overflow:hidden;
+        background: black;
+      }
+
+    .clear { 
+        clear:both; 
+    }
+    </style>
+    
+<div id="myCarousel" class="carousel slide">
+      <div class="carousel-inner">
+        <div class="item active">
+          <img id="img_plot" data-visible="true" src="http://upload.wikimedia.org/wikipedia/commons/4/46/Greenland_scenery.jpg" alt="">
+          <div class="container">
+            <div class="carousel-caption">
+              <h1>Ashiba.</h1>
+              <p class="lead">Full power of Python in the browser. This demo uses Python Imaging Library to generate a color palette of the image.</p>
+              <a class="btn btn-large btn-primary" href="#myModal" data-toggle="modal" data-target="#myModal">Select image from web</a>
+              <a class="btn btn-large btn-success" id="btn_colors" href="#">Find Colors</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+  <div class="modal-header">
+    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
+    <h3 id="myModalLabel">Enter Image URL</h3>
+  </div>
+  <div class="modal-body">
+    <p>
+        <input type="text" id="imageUrl">
+    </p>
+  </div>
+  <div class="modal-footer">
+    <button class="btn" data-dismiss="modal" aria-hidden="true">Close</button>
+    <button class="btn btn-primary" id="updateImage">Update</button>
+  </div>
+</div>
+
+    <div class="container">
+      <h2 class="featurette-heading">Dominant Color.</h2>
+      <p class="container">
+        <div id="dominantColor" class="cube"></div>
+        <div style="clear: both;"></div>
+      </p>
+
+      <hr>
+
+      <h2 class="featurette-heading">Color Palette.</h2>
+      <p class="container">
+        <div id="palette1" class="cube"></div>
+        <div id="palette2" class="cube"></div>
+        <div id="palette3" class="cube"></div>
+        <div id="palette4" class="cube"></div>
+        <div id="palette5" class="cube"></div>
+        <div style="clear: both;"></div>
+      </p>
+
+      <footer>
+        <p>&copy; 2013 Continuum Analytics</p>
+      </footer>
+</div>
