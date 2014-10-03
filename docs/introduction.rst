@@ -20,7 +20,7 @@ clean - clean up the files created during the build command
 
 --recompile - force a recompile::
 
-    $ ashiba start --recompile --open-browser .
+    ashiba start --recompile --open-browser .
 
 
 Ashiba Files

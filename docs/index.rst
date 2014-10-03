@@ -50,11 +50,11 @@ Installation Instructions
 - In order to make use of the build functionality, you need conda.
 - For the best overall experience, use the `Anaconda Python distribution <https://store.continuum.io/cshop/anaconda/>`_ ::
 
-    $ git clone git@github.com:ContinuumIO/ashiba.git
+    git clone git@github.com:ContinuumIO/ashiba.git
 
-    $ cd ashiba
+    cd ashiba
 
-    $ python setup.py install
+    python setup.py install
 
 
 

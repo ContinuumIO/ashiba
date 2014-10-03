@@ -2,4 +2,4 @@
 
 You need to recompile the app::
 
-    $ ashiba start --recompile .
+    ashiba start --recompile .

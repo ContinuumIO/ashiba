@@ -6,20 +6,20 @@ In this tutorial I will be building a github statistics web app to plot contribu
 
 The first thing we do is create a new anaconda environment on our system, activate it, and install Ashiba::
 
-    $ conda create -n ashiba anaconda
+    conda create -n ashiba anaconda
 
-    $ source activate ashiba
+    source activate ashiba
 
-    $ git clone git@github.com:ContinuumIO/ashiba.git
+    git clone git@github.com:ContinuumIO/ashiba.git
 
-    $ cd ashiba
+    cd ashiba
 
-    $ python setup.py install
+    python setup.py install
 
 
 To see what ashiba apps look like run::
 
-    $ ashiba start examples/dataframes/ --open-browser
+    ashiba start examples/dataframes/ --open-browser
 
 
 Nice right? We will build our own Ashiba app to show just how easy it is to create similar data representations.
@@ -27,7 +27,7 @@ Nice right? We will build our own Ashiba app to show just how easy it is to crea
 
 The first thing we do is initialize the project with::
 
-    $ ashiba init ashiba-example
+    ashiba init ashiba-example
 
 Cd into the new directory and you will see a ``handlers.py``, ``settings.py``, and ``myapp.html`` file. 
 
