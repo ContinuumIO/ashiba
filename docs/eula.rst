@@ -1,4 +1,7 @@
+=================================
 Ashiba END USER LICENSE AGREEMENT
+=================================
+
 Ashiba (“the Software Product”) and accompanying documentation is licensed and not sold. The Software Product is protected by copyright laws and treaties, as well as laws and treaties related to other forms of intellectual property. Continuum Analytics Inc or its subsidiaries, affiliates, and suppliers (collectively “Continuum ”) own intellectual property rights in the Software Product. The Licensee’s (“you” or “your”) license to download, use, copy, or change the Software Product is subject to these rights and to all the terms and conditions of this End User License Agreement (“Agreement”).
 
 In addition to proprietary software not available from other sources, the Software product contains a collection of software packages from other sources (“Other Vendor Tools”). Continuum may also distribute updates to these packages on an “as is” basis and subject to their individual license agreements. These licenses are available either in the package itself or via request to info@continuum.io. Continuum reserves the right to change which Other Vendor Tools are provided in Ashiba.
