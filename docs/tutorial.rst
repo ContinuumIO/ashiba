@@ -117,7 +117,7 @@ We call our functions, plot them, and return the dom.
 
 Now that we have our 4 files written we can return to our command line and run::
 
-    $ ashiba start --open-browser .
+    ashiba start --open-browser .
 
 Try searching some of Continuum's projects such as 'blaze', 'conda', or 'Bokeh'. 
 
@@ -127,9 +127,9 @@ To distribute the app we can use another cool Continuum project called `conda. <
 
 We build a package with the ashiba build command::
 
-    $ cd ..
+    cd ..
 
-    $ ashiba build ashiba-example
+    ashiba build ashiba-example
 
 
 The output should resemble::
@@ -139,7 +139,7 @@ The output should resemble::
 
 This print out shows that the command created a build directory and loaded a number of files into it, namely a ``meta.yaml``, ``build.bat``, and ``build.sh`` file. These are the build files for conda recipes, you don't really need to worry about them for now but feel free to view the `conda docs. <http://docs.continuum.io/conda/>`_ ::
 
-    $ conda build ashiba-example/build/conda-recipe
+    conda build ashiba-example/build/conda-recipe
 
 This command will ask you whether you want to upload the file to `Binstar.org <http://binstar.org>`_. Binstar is a package managment solution also made by Continuum but an account is needed to use it.
 
