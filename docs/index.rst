@@ -18,6 +18,7 @@ User Guide
 
     introduction
     tutorial
+    display
     faq
 
 
