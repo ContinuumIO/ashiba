@@ -18,7 +18,6 @@ User Guide
 
     introduction
     tutorial
-    HTML User Guide
     faq
 
 
@@ -31,7 +30,6 @@ Ashiba is completely free to use and distribute
     :maxdepth: 1
 
     eula
-    licenses
 
 
 
